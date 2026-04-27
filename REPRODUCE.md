@@ -1,20 +1,24 @@
 # Reproducing the NIDSaaS Spark Experiments
 
 This guide walks a fresh user through reproducing **all three Spark
-experiments** on the SIIT server (10.10.11.96 / hostname `siit`):
+experiments**:
 
 1. Architecture validation — proposed model deployed end-to-end
 2. Throughput sweep — sustained load characterisation
 3. sklearn vs Spark MLlib retraining benchmark
 
 Total wall-clock time, including image build and dataset generation,
-is roughly **2 hours**. If the Docker images and synthetic datasets
-already exist on the server (someone else already ran the experiments
-once), this drops to **~30 minutes**.
+is roughly **2 hours** from a cold start. If the Docker images and
+synthetic datasets already exist (someone else already ran the
+experiments once), this drops to **~30 minutes**.
+
+You can run this on either the **SIIT server** (the configuration
+the paper used) **or your own laptop**. Pick the prerequisite block
+below that matches your target.
 
 ---
 
-## 0. Prerequisites
+## 0a. Prerequisites — SIIT server
 
 You need:
 
@@ -31,6 +35,47 @@ Already installed on the server (don't re-install):
 * Custom image `nidsaas-spark-mllib:3.5.4`
 * `~/NIDSaaS-Earth/.venv` — Python venv with `httpx`, `numpy`,
   `pyarrow`, `pandas`, `scikit-learn`, `matplotlib`
+
+> The rest of this guide assumes you `ssh siit@10.10.11.96` first.
+
+## 0b. Prerequisites — Local laptop (no server)
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| OS | Linux, macOS, or Windows + WSL2 | same |
+| CPU cores | 4 | 8+ |
+| RAM | 8 GB | 16 GB+ |
+| Disk free | 20 GB | 40 GB |
+| Docker | Desktop 4.20+ or Engine 24+ | latest |
+| Python | 3.10+ | 3.10–3.12 |
+| Git | any recent version | — |
+
+**Windows users:** install Docker Desktop, enable WSL2 backend, and
+in **Settings → Resources** allocate at least 8 GB RAM (12 GB+ if
+you want to try Experiment 3).
+
+After installing Docker, in your shell of choice (WSL on Windows,
+Terminal on macOS / Linux), set up the venv inside the cloned repo:
+
+```bash
+git clone https://github.com/<username>/nidsaas.git
+cd nidsaas
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r prototype/loadtest/requirements.txt
+pip install numpy pyarrow pandas scikit-learn matplotlib
+
+# Create dataset placeholder dirs the compose mounts expect
+mkdir -p csv_CIC_IDS2017 pcap_CIC_IDS2017
+```
+
+> The rest of this guide is the **same** for server and laptop, except
+> for the `ssh siit@10.10.11.96` lines (skip them on laptop) and a
+> few rate / size knobs that should be tuned down on a laptop —
+> those are noted inline. For a laptop-focused walkthrough see
+> [`LOCAL.md`](./LOCAL.md).
 
 ---
 
