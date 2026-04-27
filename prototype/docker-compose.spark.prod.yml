@@ -1,0 +1,96 @@
+# Overlay compose file for running the proposed system *with* the
+# Apache Spark preprocessor inserted between Kafka and the detector.
+#
+# Architecture (matches the system-model figure):
+#
+#   gateway → tenant.*.raw → spark_preprocessor → tenant.*.preprocessed → detector
+#
+# Bring up the full stack with:
+#
+#   cd prototype
+#   docker compose \
+#       -f docker-compose.yml \
+#       -f docker-compose.spark.prod.yml \
+#       up -d
+#
+# To switch back to the no-Spark variant, just stop the spark_preprocessor
+# service and recreate the detector with DETECT_INPUT_TOPIC_SUFFIX=raw:
+#
+#   docker compose stop spark_preprocessor
+#   DETECT_INPUT_TOPIC_SUFFIX=raw \
+#     docker compose up -d --no-deps --force-recreate detector
+#
+# (See bench_arch_compare.sh for an automated A/B benchmark runner.)
+
+services:
+  # -------------------------------------------------------------------------
+  # One-shot job: create the .preprocessed topics that Spark writes into.
+  # Mirrors the topic_init service in the main compose file.
+  # -------------------------------------------------------------------------
+  spark_prep_topic_init:
+    image: apache/kafka:3.9.0
+    container_name: nidsaas_spark_prep_topic_init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -e
+        for tenant in acme globex initech; do
+          t="tenant.$${tenant}.preprocessed"
+          if /opt/kafka/bin/kafka-topics.sh \
+               --bootstrap-server kafka:9092 --list | grep -qx "$$t"; then
+            echo "[spark_prep_topic_init] exists: $$t"
+          else
+            /opt/kafka/bin/kafka-topics.sh \
+              --bootstrap-server kafka:9092 \
+              --create --topic "$$t" \
+              --partitions 3 --replication-factor 1
+            echo "[spark_prep_topic_init] created: $$t"
+          fi
+        done
+    networks: [nidsaas]
+    restart: "no"
+
+  # -------------------------------------------------------------------------
+  # The Spark Structured Streaming preprocessor itself.
+  # Subscribes to tenant.*.raw, validates + stages features,
+  # republishes onto tenant.*.preprocessed.
+  # -------------------------------------------------------------------------
+  spark_preprocessor:
+    build:
+      context: ./spark_preprocessor
+    container_name: nidsaas_spark_preprocessor
+    depends_on:
+      kafka:
+        condition: service_healthy
+      spark_prep_topic_init:
+        condition: service_completed_successfully
+    environment:
+      KAFKA_BOOTSTRAP: "kafka:9092"
+      SPARK_TOPIC_PATTERN: "tenant\\.\\w+\\.raw"
+      SPARK_TRIGGER_MS: "100"
+      SPARK_CHECKPOINT_DIR: "/tmp/spark-checkpoint-prep"
+    networks: [nidsaas]
+    restart: unless-stopped
+    # Cap memory so Spark doesn't fight the other 7 services on a
+    # 16-GB box. 4 GB is enough for the Minimal preprocessor at
+    # the rates we exercise in the benchmark.
+    mem_limit: 4g
+
+  # -------------------------------------------------------------------------
+  # Override the detector to consume from .preprocessed instead of .raw.
+  # The worker reads DETECT_INPUT_TOPIC_SUFFIX (default: "raw") to decide
+  # which suffix to subscribe to per tenant.
+  # -------------------------------------------------------------------------
+  detector:
+    environment:
+      DETECT_INPUT_TOPIC_SUFFIX: "preprocessed"
+    depends_on:
+      topic_init:
+        condition: service_completed_successfully
+      spark_prep_topic_init:
+        condition: service_completed_successfully
+      spark_preprocessor:
+        condition: service_started

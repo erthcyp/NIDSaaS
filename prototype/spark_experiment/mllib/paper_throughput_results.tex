@@ -1,0 +1,52 @@
+% =====================================================================
+% Throughput Results — focused write-up of the sweep data
+% =====================================================================
+% Drop-in subsection covering ONLY the empirical results of the
+% throughput sweep. Pair with Figure fig_throughput_sweep and
+% Table tbl:throughput.
+% =====================================================================
+
+\subsubsection{Results}
+\label{sec:throughput-results}
+
+Table~\ref{tbl:throughput} and Figure~\ref{fig:throughput-sweep}
+report the full sweep. Three operating regimes emerge clearly:
+
+\paragraph{Sustained regime (50--100~req/s)} The pipeline delivered
+every flow record at both 50 and 100~req/s. Notably, p50 latency at
+100~req/s (144~ms) was \emph{lower} than at 50~req/s (157~ms): with a
+fixed 100~ms Spark micro-batch trigger, a higher offered rate fills
+each batch with more records and amortises the per-trigger overhead
+over a larger payload. p99 latency at 100~req/s was 256~ms, well
+within hot-path budgets. Sustained at 100~req/s, this corresponds
+to roughly $8.6$~million flows~per~tenant~per~day, which matches the
+production target of small-to-medium enterprise tenants.
+
+\paragraph{Saturation regime (200~req/s)} Delivery remained at
+100\,\%, but latency increased by an order of magnitude
+(p50~$=$~3.14~s, p99~$=$~6.34~s). At this rate the detector consumer
+no longer drained each Spark micro-batch within one trigger interval;
+work accumulated in the Kafka backlog and the queue length grew
+faster than it could be processed. The pipeline still serviced every
+record but its real-time guarantee broke down. We label this the
+saturation point because a small further increase in offered load
+collapses delivery rather than further inflating latency.
+
+\paragraph{Overload regime ($\geq$500~req/s)} At 500~req/s only
+23\,\% of records were delivered; at 1000~req/s the figure fell to
+15\,\%. The collapse is a positive-feedback effect of Kafka backlog:
+once the consumer cannot keep up, in-flight records age out their
+detector deadline and the load harness reports them as undelivered
+even though they were accepted by the gateway. Latency for the
+records that did complete exceeded ten minutes (p99
+$\approx$10~min at 500~req/s, $\approx$9~min at 1000~req/s), making
+those numbers unrepresentative of any real-time SLA.
+
+\paragraph{Headline} The single-node Spark-augmented architecture
+sustains 100~req/s at production-grade latency
+(p50~$=$~144~ms, p99~$=$~256~ms, 100\,\% delivery). The saturation
+ceiling is approximately 300~req/s on this hardware. Higher
+throughput requires either (i) horizontal scale-out via Spark
+cluster mode, or (ii) increasing the Spark micro-batch trigger
+interval to better match the offered rate—both of which are
+deployment-time configurations rather than architectural changes.

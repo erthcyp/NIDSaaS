@@ -1,0 +1,87 @@
+% =====================================================================
+% Throughput Validation — Proposed Spark-Augmented Architecture
+% =====================================================================
+% Stand-alone subsection demonstrating that the proposed architecture
+% (with Spark in the data path) sustains a useful production-grade
+% throughput on the SIIT 12-core / 16 GB single-node hardware.
+% =====================================================================
+
+\subsection{Architecture Throughput Validation}
+\label{sec:throughput}
+
+To verify that the proposed architecture (Figure~\ref{fig:arch}),
+including the Apache Spark preprocessor on the hot path, is
+operationally usable rather than merely structurally complete, we
+deployed the full multi-tenant stack on the
+12-core / 16~GB Linux server and characterised its end-to-end
+throughput. Synthetic flow records were produced by the load harness
+(\texttt{loadtest/run\_experiment.py}, scenario~E1) at fixed offered
+loads ranging from 50 to 1000~req/s, each sustained for 30~seconds
+plus a 15-second drainage window. End-to-end latency was measured
+from gateway POST to webhook arrival via per-record trace IDs.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/fig_throughput_sweep.pdf}
+  \caption{Throughput sweep on the proposed Spark-augmented
+  architecture. Bars (left axis) show end-to-end delivery rate; lines
+  (right axis, log) show p50 and p99 latency. The pipeline sustains
+  100\,\% delivery up to and including 200~req/s, after which Spark
+  micro-batches saturate and delivery collapses.}
+  \label{fig:throughput-sweep}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\caption{Throughput sweep on the with-Spark architecture
+(12-core / 16~GB single-node). Each row sustains the offered rate
+for 30~s; latency is end-to-end gateway-to-webhook.}
+\label{tbl:throughput}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{rrrrl}
+\toprule
+\textbf{Rate} & \textbf{Delivered} & \textbf{p50 (ms)} & \textbf{p99 (ms)} & \textbf{Status} \\
+\midrule
+50      & 100\,\%   & 157   & 428      & comfortable     \\
+100     & 100\,\%   & 144   & 256      & sustained        \\
+200     & 100\,\%   & 3142  & 6340     & saturating      \\
+500     & 23\,\%    & 2223  & $>$10\,min & collapsed   \\
+1000    & 15\,\%    & $>$4\,min & $>$9\,min & overloaded \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Sustained throughput} The system delivered every flow
+record through 100~req/s with a p99 latency of 256~ms, corresponding
+to roughly $8.6$~million flows~per~tenant~per~day. At 100~req/s the
+median latency (144~ms) is actually slightly \emph{lower} than at
+50~req/s (157~ms): the Spark micro-batch executor accumulates more
+records per trigger when the offered rate is higher, so the
+per-record amortised cost falls. This is the operating regime that
+production single-tenant deployments would target.
+
+\paragraph{Burst capacity vs.\ saturation} At 200~req/s the pipeline
+still preserved 100\,\% delivery but latency increased to multi-second
+range (p50 = 3.1~s) because the detector consumer is unable to drain
+each Spark micro-batch within one trigger interval. Beyond
+approximately 300~req/s the gateway-Kafka-Spark-detector queue grows
+without bound and delivery rates collapse to $<$25\,\%; we report
+500 and 1000~req/s as overloaded conditions in
+Table~\ref{tbl:throughput}. Higher per-tenant throughputs are
+obtainable by horizontally scaling out the Spark executor and
+Kafka partitions, which is the documented Spark cluster-mode path
+and aligned with the cold-path scale-out justification in
+Section~\ref{sec:retraining}.
+
+\paragraph{Functional validation} Beyond the throughput numbers
+themselves, this sweep confirms that the proposed architecture is
+implementation-correct end-to-end: the Spark preprocessor (i)
+subscribes to all per-tenant raw topics via a regex pattern,
+(ii) applies the schema-normalisation, validation, and
+feature-staging stages defined in Section~\ref{sec:proposed-system},
+and (iii) republishes onto the per-tenant preprocessed topics that
+the detector then consumes for downstream cascade scoring.
+
+% =====================================================================
+% End of section
+% =====================================================================

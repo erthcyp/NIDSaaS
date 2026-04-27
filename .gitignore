@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Docker
+*.tar
+*.tar.gz
+.dockerignore
+
+# Secrets — never commit
+.env
+.env.local
+*.key
+*.pem
+oauth_secrets.json
+
+# Generated artefacts
+prototype/loadtest/outputs/*.json
+prototype/loadtest/outputs/*.csv
+prototype/loadtest/runs/
+prototype/spark_experiment/mllib/results.csv
+prototype/spark_experiment/mllib/fig_*.pdf
+prototype/spark_experiment/mllib/fig_*.png
+prototype/models/*.joblib
+prototype/models/*.pkl
+
+# Heavy CSV training byproducts (regenerate from pipeline scripts)
+pipeline/*.csv
+pipeline/outputs_*/
+
+# Snort eval outputs (regenerate from snort_runner.py)
+snort/outputs_*/
+
+# Datasets — too large to commit
+csv_CIC_IDS2017/
+pcap_CIC_IDS2017/
+*.pcap
+*.pcapng
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

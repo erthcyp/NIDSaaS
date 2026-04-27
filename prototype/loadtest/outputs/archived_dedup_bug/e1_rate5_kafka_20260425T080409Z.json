@@ -1,0 +1,3047 @@
+{
+  "summary": {
+    "scenario": "e1_rate5",
+    "mode": "kafka",
+    "started_at": 1777104249.2905645,
+    "duration_sec": 30.0,
+    "profiles": [
+      {
+        "tenant": "acme",
+        "secret": "acme-secret",
+        "rate_per_sec": 5.0,
+        "duration_sec": 30.0,
+        "payload_kind": "csv",
+        "pcap_bytes_per_chunk": 8192
+      }
+    ],
+    "sent": 150,
+    "accepted": 150,
+    "deduped": 0,
+    "failed": 0,
+    "delivered_traces": 150,
+    "e2e_ms_p50": 10.675668716430664,
+    "e2e_ms_p95": 19.712209701538086,
+    "e2e_ms_p99": 22.24111557006836,
+    "e2e_ms_max": 107.64098167419434,
+    "per_tenant": {
+      "acme": {
+        "sent": 150,
+        "delivered": 150,
+        "delivery_rate": 1.0,
+        "latency_ms": {
+          "n": 150,
+          "p50": 10.675668716430664,
+          "p95": 19.712209701538086,
+          "p99": 22.24111557006836,
+          "max": 107.64098167419434,
+          "mean": 11.940237681070963
+        }
+      }
+    },
+    "notes": "E1 throughput sweep: tenant=acme rate=5.0rps payload=csv duration=30.0s"
+  },
+  "sends": [
+    {
+      "trace_id": "f8786ee48c5046d3835138652365f225",
+      "tenant": "acme",
+      "send_ts": 1777104249.3037522,
+      "send_monotonic": 18210.48351397,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "e88c0158528e4a43bc73f345fb6715b6",
+      "tenant": "acme",
+      "send_ts": 1777104249.5041993,
+      "send_monotonic": 18210.683973492,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "48fe37c584fd4d278ed4ae2d5c3d7716",
+      "tenant": "acme",
+      "send_ts": 1777104249.7047505,
+      "send_monotonic": 18210.884512213,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "daa818af181a4c10bc61332726b1a2ef",
+      "tenant": "acme",
+      "send_ts": 1777104249.904599,
+      "send_monotonic": 18211.084360701,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "664203238ecf41469449f766bc4d0105",
+      "tenant": "acme",
+      "send_ts": 1777104250.104436,
+      "send_monotonic": 18211.284197446,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "d06ff024f9e34809a66daa21e6043090",
+      "tenant": "acme",
+      "send_ts": 1777104250.3041523,
+      "send_monotonic": 18211.483913916,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "b81a52a0294144f2b72e6b52fd888ffc",
+      "tenant": "acme",
+      "send_ts": 1777104250.5041661,
+      "send_monotonic": 18211.683927804,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "2d3a69e4fa494db3901860e5ada60675",
+      "tenant": "acme",
+      "send_ts": 1777104250.7050126,
+      "send_monotonic": 18211.884774171,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "742d904c045743a8a781a0508434e410",
+      "tenant": "acme",
+      "send_ts": 1777104250.9043975,
+      "send_monotonic": 18212.084159155,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "e7165a3494244cc99edbd109c787391b",
+      "tenant": "acme",
+      "send_ts": 1777104251.1044273,
+      "send_monotonic": 18212.284188974,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "025eb4c1e7b24e2aa8bcb7711c6db91c",
+      "tenant": "acme",
+      "send_ts": 1777104251.3047552,
+      "send_monotonic": 18212.484516777,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f2e9dcd6474b4922a6adc2a9ba97e968",
+      "tenant": "acme",
+      "send_ts": 1777104251.5046113,
+      "send_monotonic": 18212.684373124,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "9870403aa6de41619e46c801a704f4bb",
+      "tenant": "acme",
+      "send_ts": 1777104251.7045488,
+      "send_monotonic": 18212.88431043,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "7f0ef7bd84934386bfb44d957239f409",
+      "tenant": "acme",
+      "send_ts": 1777104251.9039395,
+      "send_monotonic": 18213.083701113,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "ce671813721047fda20ddba1aa7a36c0",
+      "tenant": "acme",
+      "send_ts": 1777104252.104156,
+      "send_monotonic": 18213.283917209,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "304de2256443417ea30099ff465398c5",
+      "tenant": "acme",
+      "send_ts": 1777104252.3040845,
+      "send_monotonic": 18213.483846032,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "44a13a4302704ef19adf82158e7c6766",
+      "tenant": "acme",
+      "send_ts": 1777104252.5038707,
+      "send_monotonic": 18213.683632274,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "e8a7a8b961084d6fa751810111869b2b",
+      "tenant": "acme",
+      "send_ts": 1777104252.705076,
+      "send_monotonic": 18213.88483775,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "5d3fcc148be94cc6ab3994df66a0854f",
+      "tenant": "acme",
+      "send_ts": 1777104252.9048202,
+      "send_monotonic": 18214.08458198,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "da9f1bf25ef440f38bb586f6224df6c8",
+      "tenant": "acme",
+      "send_ts": 1777104253.1044695,
+      "send_monotonic": 18214.284231267,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "5b65855fff444433a28ae6ba00d14d9d",
+      "tenant": "acme",
+      "send_ts": 1777104253.3048344,
+      "send_monotonic": 18214.4845958,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "51810d793d7b4e788822f04c71656395",
+      "tenant": "acme",
+      "send_ts": 1777104253.5046222,
+      "send_monotonic": 18214.684383824,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f4c3f390a99f4a329cf5471333d3d8a9",
+      "tenant": "acme",
+      "send_ts": 1777104253.7051058,
+      "send_monotonic": 18214.884867221,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "abd388cb0ff547a595547a7b535b28c2",
+      "tenant": "acme",
+      "send_ts": 1777104253.904611,
+      "send_monotonic": 18215.084372748,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "8768a649428a45ab895738d1d559ddb4",
+      "tenant": "acme",
+      "send_ts": 1777104254.1049976,
+      "send_monotonic": 18215.284759132,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "1c1ab1565a3542d69aebc4dd410a9905",
+      "tenant": "acme",
+      "send_ts": 1777104254.3045347,
+      "send_monotonic": 18215.484296414,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "1ccdaded5c4442d6b8f084055b9eaf13",
+      "tenant": "acme",
+      "send_ts": 1777104254.5041647,
+      "send_monotonic": 18215.683926156,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3b50b97deffc47038b85b132a66a351a",
+      "tenant": "acme",
+      "send_ts": 1777104254.7045286,
+      "send_monotonic": 18215.884290224,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "fe773974604a4312806af9ec071aee29",
+      "tenant": "acme",
+      "send_ts": 1777104254.9047172,
+      "send_monotonic": 18216.084478899,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "185cc35fddae4bf985f0bacb47f39a26",
+      "tenant": "acme",
+      "send_ts": 1777104255.1046855,
+      "send_monotonic": 18216.284447079,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "50f0473e78314c14a82d228e9546699f",
+      "tenant": "acme",
+      "send_ts": 1777104255.3040857,
+      "send_monotonic": 18216.48384742,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "c041ddf5b10a4588b8668fafc2316de2",
+      "tenant": "acme",
+      "send_ts": 1777104255.5047765,
+      "send_monotonic": 18216.684538208,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "768a651872ae497396e977c0580d40e1",
+      "tenant": "acme",
+      "send_ts": 1777104255.7044644,
+      "send_monotonic": 18216.884225826,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "5b5710ac8b2142b6b97e0cd5b8a055f0",
+      "tenant": "acme",
+      "send_ts": 1777104255.904007,
+      "send_monotonic": 18217.083768567,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "b8bdeb9160754b8fb641e9b20fad780d",
+      "tenant": "acme",
+      "send_ts": 1777104256.1044984,
+      "send_monotonic": 18217.284259857,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "d9b9c7406c334b27aa82e5c675082c28",
+      "tenant": "acme",
+      "send_ts": 1777104256.3043818,
+      "send_monotonic": 18217.484143595,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "c03cbed6a1984212b102f92663b0cd42",
+      "tenant": "acme",
+      "send_ts": 1777104256.5045676,
+      "send_monotonic": 18217.684328968,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "916223916c7d4ede94bb747ee3be0d25",
+      "tenant": "acme",
+      "send_ts": 1777104256.7047765,
+      "send_monotonic": 18217.884537917,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "8d422276c4b245ed9f2543557feb3011",
+      "tenant": "acme",
+      "send_ts": 1777104256.9054477,
+      "send_monotonic": 18218.085209255,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "6c34b250998e4bdba7bab8079ebb83be",
+      "tenant": "acme",
+      "send_ts": 1777104257.1047595,
+      "send_monotonic": 18218.284521025,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "14c59b9c7f2f451da22e9f51ae168500",
+      "tenant": "acme",
+      "send_ts": 1777104257.3050544,
+      "send_monotonic": 18218.484816248,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "c677cc0e75d94173bc712198993a7519",
+      "tenant": "acme",
+      "send_ts": 1777104257.504666,
+      "send_monotonic": 18218.68442748,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "7ed1f7f38cd14345ba0e6fde91603645",
+      "tenant": "acme",
+      "send_ts": 1777104258.7918591,
+      "send_monotonic": 18218.884599765,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "8ce5370c7b294a83a43044397c7014d5",
+      "tenant": "acme",
+      "send_ts": 1777104258.9914017,
+      "send_monotonic": 18219.084142246,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "79c79d65ee014c18a60395fbba140212",
+      "tenant": "acme",
+      "send_ts": 1777104261.260983,
+      "send_monotonic": 18219.284472228,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f53ecb92bd5a4874bdec64cba8da8823",
+      "tenant": "acme",
+      "send_ts": 1777104261.4607573,
+      "send_monotonic": 18219.484246484,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "291ea0c8dcd84c71b93c7f87458520c0",
+      "tenant": "acme",
+      "send_ts": 1777104261.660736,
+      "send_monotonic": 18219.684225121,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "67ec94dba7934ae38369d793245a2d3e",
+      "tenant": "acme",
+      "send_ts": 1777104261.861227,
+      "send_monotonic": 18219.884716212,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "45fa0d7a28ff4d32b472631a87ecd8a8",
+      "tenant": "acme",
+      "send_ts": 1777104262.0606027,
+      "send_monotonic": 18220.084091603,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "744b60faf2514bb78e0b9771c369ec96",
+      "tenant": "acme",
+      "send_ts": 1777104262.260686,
+      "send_monotonic": 18220.284174625,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "828db8c26e9b4186949ae1a1a7c4f6ec",
+      "tenant": "acme",
+      "send_ts": 1777104262.4608023,
+      "send_monotonic": 18220.484291129,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "cbe8ac9ed574488991fb680654161450",
+      "tenant": "acme",
+      "send_ts": 1777104262.6608021,
+      "send_monotonic": 18220.68429099,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "0591295e4ab449a7a659b5e9f0a0b465",
+      "tenant": "acme",
+      "send_ts": 1777104262.8611836,
+      "send_monotonic": 18220.884672746,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "aad63052da90486f98c18c54d5391034",
+      "tenant": "acme",
+      "send_ts": 1777104263.0610685,
+      "send_monotonic": 18221.084557668,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "bff173eef2d14b03906b25d96592bb3a",
+      "tenant": "acme",
+      "send_ts": 1777104263.2610507,
+      "send_monotonic": 18221.284539575,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "cf30c58549c34eb094b8f443b3b267a9",
+      "tenant": "acme",
+      "send_ts": 1777104263.4609137,
+      "send_monotonic": 18221.484402788,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "fcbb422083bb40968016bd32692e1935",
+      "tenant": "acme",
+      "send_ts": 1777104263.66095,
+      "send_monotonic": 18221.684439037,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "9dc937b767cc48d6b1193ef707947d31",
+      "tenant": "acme",
+      "send_ts": 1777104263.8606832,
+      "send_monotonic": 18221.884172312,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "84346b76d1a74e36a08929ccf62799ee",
+      "tenant": "acme",
+      "send_ts": 1777104264.0606809,
+      "send_monotonic": 18222.08417029,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "883ff5862eb243498fec82296f3249b5",
+      "tenant": "acme",
+      "send_ts": 1777104264.2610035,
+      "send_monotonic": 18222.284492749,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3677be3478bb4a8cadb46bb02c5d74de",
+      "tenant": "acme",
+      "send_ts": 1777104264.460896,
+      "send_monotonic": 18222.484385132,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "e1b061d3e87241088aafafe25306384f",
+      "tenant": "acme",
+      "send_ts": 1777104264.6607654,
+      "send_monotonic": 18222.684254708,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "76671497116e4357aebaa4a054c9ccf3",
+      "tenant": "acme",
+      "send_ts": 1777104264.8607621,
+      "send_monotonic": 18222.88425128,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "884de80938c14a75a7d85a5ad39d7681",
+      "tenant": "acme",
+      "send_ts": 1777104265.0609775,
+      "send_monotonic": 18223.084466543,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "4c5b81910fbb478db971c662b3bb9b6c",
+      "tenant": "acme",
+      "send_ts": 1777104265.2614615,
+      "send_monotonic": 18223.28495059,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "375e842954b74b30b2abec058d4548c7",
+      "tenant": "acme",
+      "send_ts": 1777104265.460833,
+      "send_monotonic": 18223.48432214,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "2e04a8ce24c3476c9ff46c8e583155ba",
+      "tenant": "acme",
+      "send_ts": 1777104265.660776,
+      "send_monotonic": 18223.684265107,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3bad12818a384115be84a8f8376843c0",
+      "tenant": "acme",
+      "send_ts": 1777104265.8612866,
+      "send_monotonic": 18223.884775791,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "4f31b1bdf712420f954e77c4e9f2de5e",
+      "tenant": "acme",
+      "send_ts": 1777104266.0609052,
+      "send_monotonic": 18224.084394392,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "82048ab87e174b42a0b2f5c3a27d81ee",
+      "tenant": "acme",
+      "send_ts": 1777104266.2607949,
+      "send_monotonic": 18224.284284115,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "a8e63743615b4757ac64dffc6c2a77f1",
+      "tenant": "acme",
+      "send_ts": 1777104266.460336,
+      "send_monotonic": 18224.483824735,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "13a954b5b0dc487fb0b42fd1e310c618",
+      "tenant": "acme",
+      "send_ts": 1777104266.6610012,
+      "send_monotonic": 18224.684490395,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "e8731f6bbdb24058877cb7e95b6caab1",
+      "tenant": "acme",
+      "send_ts": 1777104266.861237,
+      "send_monotonic": 18224.884726124,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "40d6a8b5e87241eebd5daf935bfddee7",
+      "tenant": "acme",
+      "send_ts": 1777104267.0603774,
+      "send_monotonic": 18225.083866502,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "a9eacd6bc99849419d445c0d6abef6dc",
+      "tenant": "acme",
+      "send_ts": 1777104267.2608562,
+      "send_monotonic": 18225.284345076,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "2c6af6bd0875447c93777e3752829717",
+      "tenant": "acme",
+      "send_ts": 1777104267.460664,
+      "send_monotonic": 18225.484153225,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "28c94906861f470ebf341d35047ce6aa",
+      "tenant": "acme",
+      "send_ts": 1777104267.660981,
+      "send_monotonic": 18225.684469966,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "d23337b6fb1444d1947998a16bf4eb26",
+      "tenant": "acme",
+      "send_ts": 1777104267.8606484,
+      "send_monotonic": 18225.884137394,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "7665c4702b754bab887eb1185e7f07c0",
+      "tenant": "acme",
+      "send_ts": 1777104268.060389,
+      "send_monotonic": 18226.083878022,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f4e0872d0d7b4f179f5b3d47f3c9f38e",
+      "tenant": "acme",
+      "send_ts": 1777104268.2610807,
+      "send_monotonic": 18226.284569902,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "bfe8b83dcdac4e8c871d8b455b1f8171",
+      "tenant": "acme",
+      "send_ts": 1777104268.460671,
+      "send_monotonic": 18226.484159783,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "2633aac65f3a4cbd807f7568e7b64112",
+      "tenant": "acme",
+      "send_ts": 1777104268.6608386,
+      "send_monotonic": 18226.684327806,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "0c5237f0d9774e77aca3a59294953c50",
+      "tenant": "acme",
+      "send_ts": 1777104268.8606308,
+      "send_monotonic": 18226.884119595,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f47a7fa0bf6142c99bb4b12b99218d07",
+      "tenant": "acme",
+      "send_ts": 1777104269.0605445,
+      "send_monotonic": 18227.084033581,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "a7b37c93370c41ec9742566e81685852",
+      "tenant": "acme",
+      "send_ts": 1777104269.2609947,
+      "send_monotonic": 18227.28448336,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "a0197e4c5ccb4537af3563174d2fb52e",
+      "tenant": "acme",
+      "send_ts": 1777104269.4608765,
+      "send_monotonic": 18227.484365458,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "287a34344c3c42f88e5a0abb822ca132",
+      "tenant": "acme",
+      "send_ts": 1777104269.6603782,
+      "send_monotonic": 18227.68386699,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f5fed5b3f321461289492e9971d90c65",
+      "tenant": "acme",
+      "send_ts": 1777104269.8602598,
+      "send_monotonic": 18227.883748773,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "4fbdf20268544019a607e5c8d651871e",
+      "tenant": "acme",
+      "send_ts": 1777104270.0608578,
+      "send_monotonic": 18228.084346806,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f07deab0f8ca4583a1535d0f5508f0cf",
+      "tenant": "acme",
+      "send_ts": 1777104270.260834,
+      "send_monotonic": 18228.284322862,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "a139fd243b024d88a5bb5bdc8dc7af67",
+      "tenant": "acme",
+      "send_ts": 1777104270.4607189,
+      "send_monotonic": 18228.484207808,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "13b7383996864b12aeec956cebcb5c2d",
+      "tenant": "acme",
+      "send_ts": 1777104270.6609852,
+      "send_monotonic": 18228.684474303,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "1bad142deac64e54939aefe51ed51c3f",
+      "tenant": "acme",
+      "send_ts": 1777104270.8605072,
+      "send_monotonic": 18228.883996138,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "846ee92f224d418cbfd76b2cac3ae4ff",
+      "tenant": "acme",
+      "send_ts": 1777104271.0601232,
+      "send_monotonic": 18229.083612167,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "430a981695c74b54bcc515a54d38dd59",
+      "tenant": "acme",
+      "send_ts": 1777104271.2612834,
+      "send_monotonic": 18229.284772093,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "5ec9a2b98bf04abab47ea05e864ad243",
+      "tenant": "acme",
+      "send_ts": 1777104271.4603493,
+      "send_monotonic": 18229.483838443,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "9c5b05f79b43411a8a52225b4f7f7815",
+      "tenant": "acme",
+      "send_ts": 1777104271.660361,
+      "send_monotonic": 18229.683849846,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "db0bf96aa3b54d20a803f760939cb06e",
+      "tenant": "acme",
+      "send_ts": 1777104271.8601015,
+      "send_monotonic": 18229.883590246,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "61ae5fe13cfa4a928b2b0c175811b7b2",
+      "tenant": "acme",
+      "send_ts": 1777104272.0604408,
+      "send_monotonic": 18230.083929817,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f71d65cbf49f436b88aa93cef47bfaae",
+      "tenant": "acme",
+      "send_ts": 1777104272.260849,
+      "send_monotonic": 18230.284337914,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "82ded0f858d84f18bb4f17a3cad87ee2",
+      "tenant": "acme",
+      "send_ts": 1777104272.4608252,
+      "send_monotonic": 18230.484314289,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "c28eb1590c8b4e529057615252ce4898",
+      "tenant": "acme",
+      "send_ts": 1777104272.660893,
+      "send_monotonic": 18230.684381772,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "fe17a80c3d1d4575be5e91be2ec38865",
+      "tenant": "acme",
+      "send_ts": 1777104272.8601458,
+      "send_monotonic": 18230.883634834,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3d234ef4a1504426a2aa9eb1bc263805",
+      "tenant": "acme",
+      "send_ts": 1777104273.0605814,
+      "send_monotonic": 18231.084070323,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3a4a572131b94001a5283ebf276dac0c",
+      "tenant": "acme",
+      "send_ts": 1777104273.2607803,
+      "send_monotonic": 18231.284269334,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "dfd1dfa7222243278321a8b0326f617f",
+      "tenant": "acme",
+      "send_ts": 1777104273.460409,
+      "send_monotonic": 18231.483897775,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "463367be3f414a46a9523e10a5ce6b84",
+      "tenant": "acme",
+      "send_ts": 1777104273.6607018,
+      "send_monotonic": 18231.684190546,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "2ae2bdc581764215844687931fe57f4c",
+      "tenant": "acme",
+      "send_ts": 1777104273.860269,
+      "send_monotonic": 18231.883757895,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "366537c128144c4d8643ee14add2d857",
+      "tenant": "acme",
+      "send_ts": 1777104274.060622,
+      "send_monotonic": 18232.084111071,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "7ac574a7c6264398b5b0c697f08b9a2c",
+      "tenant": "acme",
+      "send_ts": 1777104274.2606483,
+      "send_monotonic": 18232.284137479,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f23d26320b6748349a8ab182b2ac1bab",
+      "tenant": "acme",
+      "send_ts": 1777104274.4609172,
+      "send_monotonic": 18232.484406475,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3659dfea90024debb41c3404e74357a3",
+      "tenant": "acme",
+      "send_ts": 1777104274.661216,
+      "send_monotonic": 18232.684705119,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "066603564c824ce9a3b7bd37613a57ff",
+      "tenant": "acme",
+      "send_ts": 1777104274.8608692,
+      "send_monotonic": 18232.8843581,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3364007f2f4b4c0bad67aded1299a330",
+      "tenant": "acme",
+      "send_ts": 1777104275.0611868,
+      "send_monotonic": 18233.084675919,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "d64f08debdaa4bfe89b2eb6223b47028",
+      "tenant": "acme",
+      "send_ts": 1777104275.2606657,
+      "send_monotonic": 18233.284154528,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "25fae007f08e4d2092ff61968cb91807",
+      "tenant": "acme",
+      "send_ts": 1777104275.4609263,
+      "send_monotonic": 18233.4844151,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "c3949c4e0d2248359ee0e2b1ba6a322b",
+      "tenant": "acme",
+      "send_ts": 1777104275.6604457,
+      "send_monotonic": 18233.683934711,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "fa135776c59b41b8b2f0b27cbbab31f0",
+      "tenant": "acme",
+      "send_ts": 1777104275.8610024,
+      "send_monotonic": 18233.884491318,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "2cae66eccbd14ee482db9e7388af1104",
+      "tenant": "acme",
+      "send_ts": 1777104276.06009,
+      "send_monotonic": 18234.083579134,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "8a7b81e9af744af2a242496894ebbe2e",
+      "tenant": "acme",
+      "send_ts": 1777104276.2610571,
+      "send_monotonic": 18234.28454624,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "cb63032a70754b49ba91e1ce5b98460b",
+      "tenant": "acme",
+      "send_ts": 1777104276.460961,
+      "send_monotonic": 18234.484450227,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "c25535b21e9a491baae37f108a15895f",
+      "tenant": "acme",
+      "send_ts": 1777104276.6609104,
+      "send_monotonic": 18234.684399535,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "1800159111634e70a517ee1b8f3d1213",
+      "tenant": "acme",
+      "send_ts": 1777104276.8614893,
+      "send_monotonic": 18234.88497857,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "46a0a815e43e42369f7bf8b92061574c",
+      "tenant": "acme",
+      "send_ts": 1777104277.0615115,
+      "send_monotonic": 18235.085000612,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "d8aebf352ad94b39aeb89880a1b79552",
+      "tenant": "acme",
+      "send_ts": 1777104277.2606168,
+      "send_monotonic": 18235.284106021,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "0939b338448144e9bb596e9707522409",
+      "tenant": "acme",
+      "send_ts": 1777104277.460625,
+      "send_monotonic": 18235.484113996,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "b29169802f154484ae6d292f681e9e81",
+      "tenant": "acme",
+      "send_ts": 1777104277.6604724,
+      "send_monotonic": 18235.683961359,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "2f2210bc1c6744229b66e4b233003a2f",
+      "tenant": "acme",
+      "send_ts": 1777104277.8607595,
+      "send_monotonic": 18235.884248514,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3f0ee5040ff44a5d8395d42b36778b75",
+      "tenant": "acme",
+      "send_ts": 1777104278.060714,
+      "send_monotonic": 18236.084203023,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "2542f0d12360414ea17094c2c85e8948",
+      "tenant": "acme",
+      "send_ts": 1777104278.2604203,
+      "send_monotonic": 18236.283909614,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "6272d6b678c1431594daf8dda7daac45",
+      "tenant": "acme",
+      "send_ts": 1777104278.4604068,
+      "send_monotonic": 18236.483895644,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "37a0542a21f84e73bd6e3edf7d92c1ab",
+      "tenant": "acme",
+      "send_ts": 1777104278.6611094,
+      "send_monotonic": 18236.684598377,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "dba2c3c97bb04a0ba6ec814990d1a01c",
+      "tenant": "acme",
+      "send_ts": 1777104278.8606782,
+      "send_monotonic": 18236.884167062,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "37504d8465724f44b126eb79c17cada0",
+      "tenant": "acme",
+      "send_ts": 1777104279.0602667,
+      "send_monotonic": 18237.083755721,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "e41cff36dcc6471696cdfed02fde86d5",
+      "tenant": "acme",
+      "send_ts": 1777104279.2606926,
+      "send_monotonic": 18237.284181476,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "b3fc644201a545f9ba37b2a58866dee5",
+      "tenant": "acme",
+      "send_ts": 1777104279.4608693,
+      "send_monotonic": 18237.484358488,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "8fe912b6804242c5a337fde25413a09a",
+      "tenant": "acme",
+      "send_ts": 1777104279.6611779,
+      "send_monotonic": 18237.684666826,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "ece1fa94462d49ac9979b3fc6a7210f6",
+      "tenant": "acme",
+      "send_ts": 1777104279.860804,
+      "send_monotonic": 18237.884293211,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "a57cbaeebf904304b128dca3a31a405e",
+      "tenant": "acme",
+      "send_ts": 1777104280.0603745,
+      "send_monotonic": 18238.083863432,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "f1287c779a5c49ecabaefd50776f128a",
+      "tenant": "acme",
+      "send_ts": 1777104280.2606707,
+      "send_monotonic": 18238.284159889,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "c13e6f710be24eeb8a9f20160000318d",
+      "tenant": "acme",
+      "send_ts": 1777104280.4609544,
+      "send_monotonic": 18238.484443282,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "c11236fc0de949309ca5e10d04ffd135",
+      "tenant": "acme",
+      "send_ts": 1777104280.660584,
+      "send_monotonic": 18238.684073019,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "9ccfebcb8cfa4d3b896d2ef1baa99abe",
+      "tenant": "acme",
+      "send_ts": 1777104280.8604674,
+      "send_monotonic": 18238.883956392,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "5ddfa4c36b1942008174a405c3ac9174",
+      "tenant": "acme",
+      "send_ts": 1777104281.0604758,
+      "send_monotonic": 18239.083964807,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "3df0112bf5024569b8eb4854541985ff",
+      "tenant": "acme",
+      "send_ts": 1777104281.260962,
+      "send_monotonic": 18239.284451032,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "a61775459baf4930a9d694b6645bb2d3",
+      "tenant": "acme",
+      "send_ts": 1777104281.4614408,
+      "send_monotonic": 18239.484930175,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "75abd66840e744dbae6afa23f3fadaca",
+      "tenant": "acme",
+      "send_ts": 1777104281.6608284,
+      "send_monotonic": 18239.68431738,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "5809a684e17b4bdaaaa7b00279000c2e",
+      "tenant": "acme",
+      "send_ts": 1777104281.8611307,
+      "send_monotonic": 18239.884619916,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "d383ec678ada4357af0fe17b6c4e0b99",
+      "tenant": "acme",
+      "send_ts": 1777104282.0605803,
+      "send_monotonic": 18240.084069126,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    },
+    {
+      "trace_id": "d0fd4cee79424dccbc726a2f5a0015b7",
+      "tenant": "acme",
+      "send_ts": 1777104282.2610097,
+      "send_monotonic": 18240.284498675,
+      "accepted": true,
+      "status_code": 202,
+      "deduped": false,
+      "error": null
+    }
+  ],
+  "joined": [
+    {
+      "trace_id": "f8786ee48c5046d3835138652365f225",
+      "tenant": "acme",
+      "send_ts": 1777104249.3037522,
+      "receive_ts": 1777104249.4113932,
+      "e2e_ms": 107.64098167419434,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "e88c0158528e4a43bc73f345fb6715b6",
+      "tenant": "acme",
+      "send_ts": 1777104249.5041993,
+      "receive_ts": 1777104249.521788,
+      "e2e_ms": 17.58861541748047,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "48fe37c584fd4d278ed4ae2d5c3d7716",
+      "tenant": "acme",
+      "send_ts": 1777104249.7047505,
+      "receive_ts": 1777104249.7218008,
+      "e2e_ms": 17.05026626586914,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "daa818af181a4c10bc61332726b1a2ef",
+      "tenant": "acme",
+      "send_ts": 1777104249.904599,
+      "receive_ts": 1777104249.922102,
+      "e2e_ms": 17.503023147583008,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "664203238ecf41469449f766bc4d0105",
+      "tenant": "acme",
+      "send_ts": 1777104250.104436,
+      "receive_ts": 1777104250.1167963,
+      "e2e_ms": 12.360334396362305,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "d06ff024f9e34809a66daa21e6043090",
+      "tenant": "acme",
+      "send_ts": 1777104250.3041523,
+      "receive_ts": 1777104250.3248618,
+      "e2e_ms": 20.709514617919922,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "b81a52a0294144f2b72e6b52fd888ffc",
+      "tenant": "acme",
+      "send_ts": 1777104250.5041661,
+      "receive_ts": 1777104250.5200238,
+      "e2e_ms": 15.857696533203125,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "2d3a69e4fa494db3901860e5ada60675",
+      "tenant": "acme",
+      "send_ts": 1777104250.7050126,
+      "receive_ts": 1777104250.7229197,
+      "e2e_ms": 17.907142639160156,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "742d904c045743a8a781a0508434e410",
+      "tenant": "acme",
+      "send_ts": 1777104250.9043975,
+      "receive_ts": 1777104250.9216168,
+      "e2e_ms": 17.21930503845215,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "e7165a3494244cc99edbd109c787391b",
+      "tenant": "acme",
+      "send_ts": 1777104251.1044273,
+      "receive_ts": 1777104251.1220312,
+      "e2e_ms": 17.60387420654297,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "025eb4c1e7b24e2aa8bcb7711c6db91c",
+      "tenant": "acme",
+      "send_ts": 1777104251.3047552,
+      "receive_ts": 1777104251.320147,
+      "e2e_ms": 15.391826629638672,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f2e9dcd6474b4922a6adc2a9ba97e968",
+      "tenant": "acme",
+      "send_ts": 1777104251.5046113,
+      "receive_ts": 1777104251.522605,
+      "e2e_ms": 17.993688583374023,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "9870403aa6de41619e46c801a704f4bb",
+      "tenant": "acme",
+      "send_ts": 1777104251.7045488,
+      "receive_ts": 1777104251.7188084,
+      "e2e_ms": 14.259576797485352,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "7f0ef7bd84934386bfb44d957239f409",
+      "tenant": "acme",
+      "send_ts": 1777104251.9039395,
+      "receive_ts": 1777104251.912649,
+      "e2e_ms": 8.709430694580078,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "ce671813721047fda20ddba1aa7a36c0",
+      "tenant": "acme",
+      "send_ts": 1777104252.104156,
+      "receive_ts": 1777104252.1111166,
+      "e2e_ms": 6.960630416870117,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "304de2256443417ea30099ff465398c5",
+      "tenant": "acme",
+      "send_ts": 1777104252.3040845,
+      "receive_ts": 1777104252.311908,
+      "e2e_ms": 7.823467254638672,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "44a13a4302704ef19adf82158e7c6766",
+      "tenant": "acme",
+      "send_ts": 1777104252.5038707,
+      "receive_ts": 1777104252.509973,
+      "e2e_ms": 6.102323532104492,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "e8a7a8b961084d6fa751810111869b2b",
+      "tenant": "acme",
+      "send_ts": 1777104252.705076,
+      "receive_ts": 1777104252.7217877,
+      "e2e_ms": 16.711711883544922,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "5d3fcc148be94cc6ab3994df66a0854f",
+      "tenant": "acme",
+      "send_ts": 1777104252.9048202,
+      "receive_ts": 1777104252.920423,
+      "e2e_ms": 15.602827072143555,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "da9f1bf25ef440f38bb586f6224df6c8",
+      "tenant": "acme",
+      "send_ts": 1777104253.1044695,
+      "receive_ts": 1777104253.1221366,
+      "e2e_ms": 17.667055130004883,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "5b65855fff444433a28ae6ba00d14d9d",
+      "tenant": "acme",
+      "send_ts": 1777104253.3048344,
+      "receive_ts": 1777104253.3190002,
+      "e2e_ms": 14.165878295898438,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "51810d793d7b4e788822f04c71656395",
+      "tenant": "acme",
+      "send_ts": 1777104253.5046222,
+      "receive_ts": 1777104253.5163171,
+      "e2e_ms": 11.694908142089844,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f4c3f390a99f4a329cf5471333d3d8a9",
+      "tenant": "acme",
+      "send_ts": 1777104253.7051058,
+      "receive_ts": 1777104253.7173316,
+      "e2e_ms": 12.225866317749023,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "abd388cb0ff547a595547a7b535b28c2",
+      "tenant": "acme",
+      "send_ts": 1777104253.904611,
+      "receive_ts": 1777104253.9152286,
+      "e2e_ms": 10.617494583129883,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "8768a649428a45ab895738d1d559ddb4",
+      "tenant": "acme",
+      "send_ts": 1777104254.1049976,
+      "receive_ts": 1777104254.1161313,
+      "e2e_ms": 11.133670806884766,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "1c1ab1565a3542d69aebc4dd410a9905",
+      "tenant": "acme",
+      "send_ts": 1777104254.3045347,
+      "receive_ts": 1777104254.3153539,
+      "e2e_ms": 10.819196701049805,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "1ccdaded5c4442d6b8f084055b9eaf13",
+      "tenant": "acme",
+      "send_ts": 1777104254.5041647,
+      "receive_ts": 1777104254.5154529,
+      "e2e_ms": 11.288166046142578,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3b50b97deffc47038b85b132a66a351a",
+      "tenant": "acme",
+      "send_ts": 1777104254.7045286,
+      "receive_ts": 1777104254.7145922,
+      "e2e_ms": 10.063648223876953,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "fe773974604a4312806af9ec071aee29",
+      "tenant": "acme",
+      "send_ts": 1777104254.9047172,
+      "receive_ts": 1777104254.917086,
+      "e2e_ms": 12.36867904663086,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "185cc35fddae4bf985f0bacb47f39a26",
+      "tenant": "acme",
+      "send_ts": 1777104255.1046855,
+      "receive_ts": 1777104255.1177027,
+      "e2e_ms": 13.01717758178711,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "50f0473e78314c14a82d228e9546699f",
+      "tenant": "acme",
+      "send_ts": 1777104255.3040857,
+      "receive_ts": 1777104255.3132963,
+      "e2e_ms": 9.210586547851562,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "c041ddf5b10a4588b8668fafc2316de2",
+      "tenant": "acme",
+      "send_ts": 1777104255.5047765,
+      "receive_ts": 1777104255.5244887,
+      "e2e_ms": 19.712209701538086,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "768a651872ae497396e977c0580d40e1",
+      "tenant": "acme",
+      "send_ts": 1777104255.7044644,
+      "receive_ts": 1777104255.7167625,
+      "e2e_ms": 12.298107147216797,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "5b5710ac8b2142b6b97e0cd5b8a055f0",
+      "tenant": "acme",
+      "send_ts": 1777104255.904007,
+      "receive_ts": 1777104255.9138432,
+      "e2e_ms": 9.836196899414062,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "b8bdeb9160754b8fb641e9b20fad780d",
+      "tenant": "acme",
+      "send_ts": 1777104256.1044984,
+      "receive_ts": 1777104256.1139832,
+      "e2e_ms": 9.48476791381836,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "d9b9c7406c334b27aa82e5c675082c28",
+      "tenant": "acme",
+      "send_ts": 1777104256.3043818,
+      "receive_ts": 1777104256.3149555,
+      "e2e_ms": 10.573625564575195,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "c03cbed6a1984212b102f92663b0cd42",
+      "tenant": "acme",
+      "send_ts": 1777104256.5045676,
+      "receive_ts": 1777104256.5142913,
+      "e2e_ms": 9.723663330078125,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "916223916c7d4ede94bb747ee3be0d25",
+      "tenant": "acme",
+      "send_ts": 1777104256.7047765,
+      "receive_ts": 1777104256.715254,
+      "e2e_ms": 10.477542877197266,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "8d422276c4b245ed9f2543557feb3011",
+      "tenant": "acme",
+      "send_ts": 1777104256.9054477,
+      "receive_ts": 1777104256.9196296,
+      "e2e_ms": 14.181852340698242,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "6c34b250998e4bdba7bab8079ebb83be",
+      "tenant": "acme",
+      "send_ts": 1777104257.1047595,
+      "receive_ts": 1777104257.1132624,
+      "e2e_ms": 8.502960205078125,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "14c59b9c7f2f451da22e9f51ae168500",
+      "tenant": "acme",
+      "send_ts": 1777104257.3050544,
+      "receive_ts": 1777104257.3234174,
+      "e2e_ms": 18.362998962402344,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "c677cc0e75d94173bc712198993a7519",
+      "tenant": "acme",
+      "send_ts": 1777104257.504666,
+      "receive_ts": 1777104257.5142045,
+      "e2e_ms": 9.538412094116211,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "7ed1f7f38cd14345ba0e6fde91603645",
+      "tenant": "acme",
+      "send_ts": 1777104258.7918591,
+      "receive_ts": 1777104258.8141003,
+      "e2e_ms": 22.24111557006836,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "8ce5370c7b294a83a43044397c7014d5",
+      "tenant": "acme",
+      "send_ts": 1777104258.9914017,
+      "receive_ts": 1777104259.008647,
+      "e2e_ms": 17.24529266357422,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "79c79d65ee014c18a60395fbba140212",
+      "tenant": "acme",
+      "send_ts": 1777104261.260983,
+      "receive_ts": 1777104261.2810597,
+      "e2e_ms": 20.076751708984375,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f53ecb92bd5a4874bdec64cba8da8823",
+      "tenant": "acme",
+      "send_ts": 1777104261.4607573,
+      "receive_ts": 1777104261.4824934,
+      "e2e_ms": 21.73614501953125,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "291ea0c8dcd84c71b93c7f87458520c0",
+      "tenant": "acme",
+      "send_ts": 1777104261.660736,
+      "receive_ts": 1777104261.6797833,
+      "e2e_ms": 19.047260284423828,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "67ec94dba7934ae38369d793245a2d3e",
+      "tenant": "acme",
+      "send_ts": 1777104261.861227,
+      "receive_ts": 1777104261.879482,
+      "e2e_ms": 18.254995346069336,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "45fa0d7a28ff4d32b472631a87ecd8a8",
+      "tenant": "acme",
+      "send_ts": 1777104262.0606027,
+      "receive_ts": 1777104262.0654738,
+      "e2e_ms": 4.871129989624023,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "744b60faf2514bb78e0b9771c369ec96",
+      "tenant": "acme",
+      "send_ts": 1777104262.260686,
+      "receive_ts": 1777104262.266569,
+      "e2e_ms": 5.882978439331055,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "828db8c26e9b4186949ae1a1a7c4f6ec",
+      "tenant": "acme",
+      "send_ts": 1777104262.4608023,
+      "receive_ts": 1777104262.4669619,
+      "e2e_ms": 6.159543991088867,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "cbe8ac9ed574488991fb680654161450",
+      "tenant": "acme",
+      "send_ts": 1777104262.6608021,
+      "receive_ts": 1777104262.6672435,
+      "e2e_ms": 6.441354751586914,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "0591295e4ab449a7a659b5e9f0a0b465",
+      "tenant": "acme",
+      "send_ts": 1777104262.8611836,
+      "receive_ts": 1777104262.874915,
+      "e2e_ms": 13.731241226196289,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "aad63052da90486f98c18c54d5391034",
+      "tenant": "acme",
+      "send_ts": 1777104263.0610685,
+      "receive_ts": 1777104263.0746307,
+      "e2e_ms": 13.562202453613281,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "bff173eef2d14b03906b25d96592bb3a",
+      "tenant": "acme",
+      "send_ts": 1777104263.2610507,
+      "receive_ts": 1777104263.273291,
+      "e2e_ms": 12.240409851074219,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "cf30c58549c34eb094b8f443b3b267a9",
+      "tenant": "acme",
+      "send_ts": 1777104263.4609137,
+      "receive_ts": 1777104263.4738512,
+      "e2e_ms": 12.937545776367188,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "fcbb422083bb40968016bd32692e1935",
+      "tenant": "acme",
+      "send_ts": 1777104263.66095,
+      "receive_ts": 1777104263.6730967,
+      "e2e_ms": 12.146711349487305,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "9dc937b767cc48d6b1193ef707947d31",
+      "tenant": "acme",
+      "send_ts": 1777104263.8606832,
+      "receive_ts": 1777104263.875865,
+      "e2e_ms": 15.181779861450195,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "84346b76d1a74e36a08929ccf62799ee",
+      "tenant": "acme",
+      "send_ts": 1777104264.0606809,
+      "receive_ts": 1777104264.0745244,
+      "e2e_ms": 13.843536376953125,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "883ff5862eb243498fec82296f3249b5",
+      "tenant": "acme",
+      "send_ts": 1777104264.2610035,
+      "receive_ts": 1777104264.274881,
+      "e2e_ms": 13.877391815185547,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3677be3478bb4a8cadb46bb02c5d74de",
+      "tenant": "acme",
+      "send_ts": 1777104264.460896,
+      "receive_ts": 1777104264.4752893,
+      "e2e_ms": 14.393329620361328,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "e1b061d3e87241088aafafe25306384f",
+      "tenant": "acme",
+      "send_ts": 1777104264.6607654,
+      "receive_ts": 1777104264.6765938,
+      "e2e_ms": 15.828371047973633,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "76671497116e4357aebaa4a054c9ccf3",
+      "tenant": "acme",
+      "send_ts": 1777104264.8607621,
+      "receive_ts": 1777104264.8795657,
+      "e2e_ms": 18.80359649658203,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "884de80938c14a75a7d85a5ad39d7681",
+      "tenant": "acme",
+      "send_ts": 1777104265.0609775,
+      "receive_ts": 1777104265.0737069,
+      "e2e_ms": 12.729406356811523,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "4c5b81910fbb478db971c662b3bb9b6c",
+      "tenant": "acme",
+      "send_ts": 1777104265.2614615,
+      "receive_ts": 1777104265.2764618,
+      "e2e_ms": 15.000343322753906,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "375e842954b74b30b2abec058d4548c7",
+      "tenant": "acme",
+      "send_ts": 1777104265.460833,
+      "receive_ts": 1777104265.4748223,
+      "e2e_ms": 13.98921012878418,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "2e04a8ce24c3476c9ff46c8e583155ba",
+      "tenant": "acme",
+      "send_ts": 1777104265.660776,
+      "receive_ts": 1777104265.6748974,
+      "e2e_ms": 14.121532440185547,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3bad12818a384115be84a8f8376843c0",
+      "tenant": "acme",
+      "send_ts": 1777104265.8612866,
+      "receive_ts": 1777104265.8717732,
+      "e2e_ms": 10.486602783203125,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "4f31b1bdf712420f954e77c4e9f2de5e",
+      "tenant": "acme",
+      "send_ts": 1777104266.0609052,
+      "receive_ts": 1777104266.0770779,
+      "e2e_ms": 16.17264747619629,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "82048ab87e174b42a0b2f5c3a27d81ee",
+      "tenant": "acme",
+      "send_ts": 1777104266.2607949,
+      "receive_ts": 1777104266.279981,
+      "e2e_ms": 19.186019897460938,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "a8e63743615b4757ac64dffc6c2a77f1",
+      "tenant": "acme",
+      "send_ts": 1777104266.460336,
+      "receive_ts": 1777104266.467739,
+      "e2e_ms": 7.403135299682617,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "13a954b5b0dc487fb0b42fd1e310c618",
+      "tenant": "acme",
+      "send_ts": 1777104266.6610012,
+      "receive_ts": 1777104266.673382,
+      "e2e_ms": 12.380838394165039,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "e8731f6bbdb24058877cb7e95b6caab1",
+      "tenant": "acme",
+      "send_ts": 1777104266.861237,
+      "receive_ts": 1777104266.8769267,
+      "e2e_ms": 15.689611434936523,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "40d6a8b5e87241eebd5daf935bfddee7",
+      "tenant": "acme",
+      "send_ts": 1777104267.0603774,
+      "receive_ts": 1777104267.0767353,
+      "e2e_ms": 16.357898712158203,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "a9eacd6bc99849419d445c0d6abef6dc",
+      "tenant": "acme",
+      "send_ts": 1777104267.2608562,
+      "receive_ts": 1777104267.2756038,
+      "e2e_ms": 14.74761962890625,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "2c6af6bd0875447c93777e3752829717",
+      "tenant": "acme",
+      "send_ts": 1777104267.460664,
+      "receive_ts": 1777104267.478058,
+      "e2e_ms": 17.394065856933594,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "28c94906861f470ebf341d35047ce6aa",
+      "tenant": "acme",
+      "send_ts": 1777104267.660981,
+      "receive_ts": 1777104267.6715019,
+      "e2e_ms": 10.52093505859375,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "d23337b6fb1444d1947998a16bf4eb26",
+      "tenant": "acme",
+      "send_ts": 1777104267.8606484,
+      "receive_ts": 1777104267.8659577,
+      "e2e_ms": 5.309343338012695,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "7665c4702b754bab887eb1185e7f07c0",
+      "tenant": "acme",
+      "send_ts": 1777104268.060389,
+      "receive_ts": 1777104268.065342,
+      "e2e_ms": 4.952907562255859,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f4e0872d0d7b4f179f5b3d47f3c9f38e",
+      "tenant": "acme",
+      "send_ts": 1777104268.2610807,
+      "receive_ts": 1777104268.2704215,
+      "e2e_ms": 9.340763092041016,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "bfe8b83dcdac4e8c871d8b455b1f8171",
+      "tenant": "acme",
+      "send_ts": 1777104268.460671,
+      "receive_ts": 1777104268.466429,
+      "e2e_ms": 5.758047103881836,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "2633aac65f3a4cbd807f7568e7b64112",
+      "tenant": "acme",
+      "send_ts": 1777104268.6608386,
+      "receive_ts": 1777104268.6661215,
+      "e2e_ms": 5.282878875732422,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "0c5237f0d9774e77aca3a59294953c50",
+      "tenant": "acme",
+      "send_ts": 1777104268.8606308,
+      "receive_ts": 1777104268.8669205,
+      "e2e_ms": 6.28972053527832,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f47a7fa0bf6142c99bb4b12b99218d07",
+      "tenant": "acme",
+      "send_ts": 1777104269.0605445,
+      "receive_ts": 1777104269.0666614,
+      "e2e_ms": 6.1168670654296875,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "a7b37c93370c41ec9742566e81685852",
+      "tenant": "acme",
+      "send_ts": 1777104269.2609947,
+      "receive_ts": 1777104269.2661595,
+      "e2e_ms": 5.164861679077148,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "a0197e4c5ccb4537af3563174d2fb52e",
+      "tenant": "acme",
+      "send_ts": 1777104269.4608765,
+      "receive_ts": 1777104269.4681954,
+      "e2e_ms": 7.318973541259766,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "287a34344c3c42f88e5a0abb822ca132",
+      "tenant": "acme",
+      "send_ts": 1777104269.6603782,
+      "receive_ts": 1777104269.6656015,
+      "e2e_ms": 5.223274230957031,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f5fed5b3f321461289492e9971d90c65",
+      "tenant": "acme",
+      "send_ts": 1777104269.8602598,
+      "receive_ts": 1777104269.866601,
+      "e2e_ms": 6.341218948364258,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "4fbdf20268544019a607e5c8d651871e",
+      "tenant": "acme",
+      "send_ts": 1777104270.0608578,
+      "receive_ts": 1777104270.0667331,
+      "e2e_ms": 5.875349044799805,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f07deab0f8ca4583a1535d0f5508f0cf",
+      "tenant": "acme",
+      "send_ts": 1777104270.260834,
+      "receive_ts": 1777104270.2657704,
+      "e2e_ms": 4.936456680297852,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "a139fd243b024d88a5bb5bdc8dc7af67",
+      "tenant": "acme",
+      "send_ts": 1777104270.4607189,
+      "receive_ts": 1777104270.4660802,
+      "e2e_ms": 5.361318588256836,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "13b7383996864b12aeec956cebcb5c2d",
+      "tenant": "acme",
+      "send_ts": 1777104270.6609852,
+      "receive_ts": 1777104270.6661525,
+      "e2e_ms": 5.167245864868164,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "1bad142deac64e54939aefe51ed51c3f",
+      "tenant": "acme",
+      "send_ts": 1777104270.8605072,
+      "receive_ts": 1777104270.865779,
+      "e2e_ms": 5.271673202514648,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "846ee92f224d418cbfd76b2cac3ae4ff",
+      "tenant": "acme",
+      "send_ts": 1777104271.0601232,
+      "receive_ts": 1777104271.066345,
+      "e2e_ms": 6.221771240234375,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "430a981695c74b54bcc515a54d38dd59",
+      "tenant": "acme",
+      "send_ts": 1777104271.2612834,
+      "receive_ts": 1777104271.2666953,
+      "e2e_ms": 5.411863327026367,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "5ec9a2b98bf04abab47ea05e864ad243",
+      "tenant": "acme",
+      "send_ts": 1777104271.4603493,
+      "receive_ts": 1777104271.465926,
+      "e2e_ms": 5.576610565185547,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "9c5b05f79b43411a8a52225b4f7f7815",
+      "tenant": "acme",
+      "send_ts": 1777104271.660361,
+      "receive_ts": 1777104271.666615,
+      "e2e_ms": 6.253957748413086,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "db0bf96aa3b54d20a803f760939cb06e",
+      "tenant": "acme",
+      "send_ts": 1777104271.8601015,
+      "receive_ts": 1777104271.8661573,
+      "e2e_ms": 6.0558319091796875,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "61ae5fe13cfa4a928b2b0c175811b7b2",
+      "tenant": "acme",
+      "send_ts": 1777104272.0604408,
+      "receive_ts": 1777104272.0668359,
+      "e2e_ms": 6.395101547241211,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f71d65cbf49f436b88aa93cef47bfaae",
+      "tenant": "acme",
+      "send_ts": 1777104272.260849,
+      "receive_ts": 1777104272.2674918,
+      "e2e_ms": 6.642818450927734,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "82ded0f858d84f18bb4f17a3cad87ee2",
+      "tenant": "acme",
+      "send_ts": 1777104272.4608252,
+      "receive_ts": 1777104272.4720004,
+      "e2e_ms": 11.175155639648438,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "c28eb1590c8b4e529057615252ce4898",
+      "tenant": "acme",
+      "send_ts": 1777104272.660893,
+      "receive_ts": 1777104272.669779,
+      "e2e_ms": 8.886098861694336,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "fe17a80c3d1d4575be5e91be2ec38865",
+      "tenant": "acme",
+      "send_ts": 1777104272.8601458,
+      "receive_ts": 1777104272.8671176,
+      "e2e_ms": 6.971836090087891,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3d234ef4a1504426a2aa9eb1bc263805",
+      "tenant": "acme",
+      "send_ts": 1777104273.0605814,
+      "receive_ts": 1777104273.0670366,
+      "e2e_ms": 6.455183029174805,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3a4a572131b94001a5283ebf276dac0c",
+      "tenant": "acme",
+      "send_ts": 1777104273.2607803,
+      "receive_ts": 1777104273.2702851,
+      "e2e_ms": 9.50479507446289,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "dfd1dfa7222243278321a8b0326f617f",
+      "tenant": "acme",
+      "send_ts": 1777104273.460409,
+      "receive_ts": 1777104273.4658527,
+      "e2e_ms": 5.443811416625977,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "463367be3f414a46a9523e10a5ce6b84",
+      "tenant": "acme",
+      "send_ts": 1777104273.6607018,
+      "receive_ts": 1777104273.6687171,
+      "e2e_ms": 8.01539421081543,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "2ae2bdc581764215844687931fe57f4c",
+      "tenant": "acme",
+      "send_ts": 1777104273.860269,
+      "receive_ts": 1777104273.8675056,
+      "e2e_ms": 7.236480712890625,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "366537c128144c4d8643ee14add2d857",
+      "tenant": "acme",
+      "send_ts": 1777104274.060622,
+      "receive_ts": 1777104274.069418,
+      "e2e_ms": 8.795976638793945,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "7ac574a7c6264398b5b0c697f08b9a2c",
+      "tenant": "acme",
+      "send_ts": 1777104274.2606483,
+      "receive_ts": 1777104274.2804615,
+      "e2e_ms": 19.81329917907715,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f23d26320b6748349a8ab182b2ac1bab",
+      "tenant": "acme",
+      "send_ts": 1777104274.4609172,
+      "receive_ts": 1777104274.4692085,
+      "e2e_ms": 8.291244506835938,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3659dfea90024debb41c3404e74357a3",
+      "tenant": "acme",
+      "send_ts": 1777104274.661216,
+      "receive_ts": 1777104274.6776464,
+      "e2e_ms": 16.430377960205078,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "066603564c824ce9a3b7bd37613a57ff",
+      "tenant": "acme",
+      "send_ts": 1777104274.8608692,
+      "receive_ts": 1777104274.8716295,
+      "e2e_ms": 10.760307312011719,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3364007f2f4b4c0bad67aded1299a330",
+      "tenant": "acme",
+      "send_ts": 1777104275.0611868,
+      "receive_ts": 1777104275.080887,
+      "e2e_ms": 19.700288772583008,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "d64f08debdaa4bfe89b2eb6223b47028",
+      "tenant": "acme",
+      "send_ts": 1777104275.2606657,
+      "receive_ts": 1777104275.2694082,
+      "e2e_ms": 8.742570877075195,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "25fae007f08e4d2092ff61968cb91807",
+      "tenant": "acme",
+      "send_ts": 1777104275.4609263,
+      "receive_ts": 1777104275.4682708,
+      "e2e_ms": 7.344484329223633,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "c3949c4e0d2248359ee0e2b1ba6a322b",
+      "tenant": "acme",
+      "send_ts": 1777104275.6604457,
+      "receive_ts": 1777104275.666337,
+      "e2e_ms": 5.891323089599609,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "fa135776c59b41b8b2f0b27cbbab31f0",
+      "tenant": "acme",
+      "send_ts": 1777104275.8610024,
+      "receive_ts": 1777104275.8672898,
+      "e2e_ms": 6.287336349487305,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "2cae66eccbd14ee482db9e7388af1104",
+      "tenant": "acme",
+      "send_ts": 1777104276.06009,
+      "receive_ts": 1777104276.0689883,
+      "e2e_ms": 8.898258209228516,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "8a7b81e9af744af2a242496894ebbe2e",
+      "tenant": "acme",
+      "send_ts": 1777104276.2610571,
+      "receive_ts": 1777104276.2762496,
+      "e2e_ms": 15.192508697509766,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "cb63032a70754b49ba91e1ce5b98460b",
+      "tenant": "acme",
+      "send_ts": 1777104276.460961,
+      "receive_ts": 1777104276.477341,
+      "e2e_ms": 16.379833221435547,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "c25535b21e9a491baae37f108a15895f",
+      "tenant": "acme",
+      "send_ts": 1777104276.6609104,
+      "receive_ts": 1777104276.6828654,
+      "e2e_ms": 21.955013275146484,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "1800159111634e70a517ee1b8f3d1213",
+      "tenant": "acme",
+      "send_ts": 1777104276.8614893,
+      "receive_ts": 1777104276.877166,
+      "e2e_ms": 15.676736831665039,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "46a0a815e43e42369f7bf8b92061574c",
+      "tenant": "acme",
+      "send_ts": 1777104277.0615115,
+      "receive_ts": 1777104277.0750272,
+      "e2e_ms": 13.515710830688477,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "d8aebf352ad94b39aeb89880a1b79552",
+      "tenant": "acme",
+      "send_ts": 1777104277.2606168,
+      "receive_ts": 1777104277.2758799,
+      "e2e_ms": 15.263080596923828,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "0939b338448144e9bb596e9707522409",
+      "tenant": "acme",
+      "send_ts": 1777104277.460625,
+      "receive_ts": 1777104277.47279,
+      "e2e_ms": 12.165069580078125,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "b29169802f154484ae6d292f681e9e81",
+      "tenant": "acme",
+      "send_ts": 1777104277.6604724,
+      "receive_ts": 1777104277.6659164,
+      "e2e_ms": 5.444049835205078,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "2f2210bc1c6744229b66e4b233003a2f",
+      "tenant": "acme",
+      "send_ts": 1777104277.8607595,
+      "receive_ts": 1777104277.867849,
+      "e2e_ms": 7.0896148681640625,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3f0ee5040ff44a5d8395d42b36778b75",
+      "tenant": "acme",
+      "send_ts": 1777104278.060714,
+      "receive_ts": 1777104278.0698342,
+      "e2e_ms": 9.12022590637207,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "2542f0d12360414ea17094c2c85e8948",
+      "tenant": "acme",
+      "send_ts": 1777104278.2604203,
+      "receive_ts": 1777104278.273963,
+      "e2e_ms": 13.542652130126953,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "6272d6b678c1431594daf8dda7daac45",
+      "tenant": "acme",
+      "send_ts": 1777104278.4604068,
+      "receive_ts": 1777104278.466433,
+      "e2e_ms": 6.026268005371094,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "37a0542a21f84e73bd6e3edf7d92c1ab",
+      "tenant": "acme",
+      "send_ts": 1777104278.6611094,
+      "receive_ts": 1777104278.6698966,
+      "e2e_ms": 8.787155151367188,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "dba2c3c97bb04a0ba6ec814990d1a01c",
+      "tenant": "acme",
+      "send_ts": 1777104278.8606782,
+      "receive_ts": 1777104278.8667674,
+      "e2e_ms": 6.089210510253906,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "37504d8465724f44b126eb79c17cada0",
+      "tenant": "acme",
+      "send_ts": 1777104279.0602667,
+      "receive_ts": 1777104279.0666375,
+      "e2e_ms": 6.370782852172852,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "e41cff36dcc6471696cdfed02fde86d5",
+      "tenant": "acme",
+      "send_ts": 1777104279.2606926,
+      "receive_ts": 1777104279.267476,
+      "e2e_ms": 6.783485412597656,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "b3fc644201a545f9ba37b2a58866dee5",
+      "tenant": "acme",
+      "send_ts": 1777104279.4608693,
+      "receive_ts": 1777104279.4731824,
+      "e2e_ms": 12.313127517700195,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "8fe912b6804242c5a337fde25413a09a",
+      "tenant": "acme",
+      "send_ts": 1777104279.6611779,
+      "receive_ts": 1777104279.668923,
+      "e2e_ms": 7.745027542114258,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "ece1fa94462d49ac9979b3fc6a7210f6",
+      "tenant": "acme",
+      "send_ts": 1777104279.860804,
+      "receive_ts": 1777104279.8714797,
+      "e2e_ms": 10.675668716430664,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "a57cbaeebf904304b128dca3a31a405e",
+      "tenant": "acme",
+      "send_ts": 1777104280.0603745,
+      "receive_ts": 1777104280.0661092,
+      "e2e_ms": 5.734682083129883,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "f1287c779a5c49ecabaefd50776f128a",
+      "tenant": "acme",
+      "send_ts": 1777104280.2606707,
+      "receive_ts": 1777104280.272208,
+      "e2e_ms": 11.537313461303711,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "c13e6f710be24eeb8a9f20160000318d",
+      "tenant": "acme",
+      "send_ts": 1777104280.4609544,
+      "receive_ts": 1777104280.4684103,
+      "e2e_ms": 7.4558258056640625,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "c11236fc0de949309ca5e10d04ffd135",
+      "tenant": "acme",
+      "send_ts": 1777104280.660584,
+      "receive_ts": 1777104280.6656022,
+      "e2e_ms": 5.0182342529296875,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "9ccfebcb8cfa4d3b896d2ef1baa99abe",
+      "tenant": "acme",
+      "send_ts": 1777104280.8604674,
+      "receive_ts": 1777104280.8687396,
+      "e2e_ms": 8.272171020507812,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "5ddfa4c36b1942008174a405c3ac9174",
+      "tenant": "acme",
+      "send_ts": 1777104281.0604758,
+      "receive_ts": 1777104281.074724,
+      "e2e_ms": 14.248132705688477,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "3df0112bf5024569b8eb4854541985ff",
+      "tenant": "acme",
+      "send_ts": 1777104281.260962,
+      "receive_ts": 1777104281.273095,
+      "e2e_ms": 12.132883071899414,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "a61775459baf4930a9d694b6645bb2d3",
+      "tenant": "acme",
+      "send_ts": 1777104281.4614408,
+      "receive_ts": 1777104281.4802933,
+      "e2e_ms": 18.85247230529785,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "75abd66840e744dbae6afa23f3fadaca",
+      "tenant": "acme",
+      "send_ts": 1777104281.6608284,
+      "receive_ts": 1777104281.6664672,
+      "e2e_ms": 5.638837814331055,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "5809a684e17b4bdaaaa7b00279000c2e",
+      "tenant": "acme",
+      "send_ts": 1777104281.8611307,
+      "receive_ts": 1777104281.8746123,
+      "e2e_ms": 13.481616973876953,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "d383ec678ada4357af0fe17b6c4e0b99",
+      "tenant": "acme",
+      "send_ts": 1777104282.0605803,
+      "receive_ts": 1777104282.0700738,
+      "e2e_ms": 9.493589401245117,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    },
+    {
+      "trace_id": "d0fd4cee79424dccbc726a2f5a0015b7",
+      "tenant": "acme",
+      "send_ts": 1777104282.2610097,
+      "receive_ts": 1777104282.2664878,
+      "e2e_ms": 5.478143692016602,
+      "receipts": 1,
+      "accepted": true,
+      "deduped": false
+    }
+  ]
+}

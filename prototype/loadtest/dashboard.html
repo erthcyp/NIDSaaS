@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NIDSaaS Load Test Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f6f7f9; color: #222; margin: 0;
+    padding: 24px 36px; max-width: 1400px;
+    margin-left: auto; margin-right: auto;
+  }
+  h1 { margin: 0 0 6px 0; font-size: 26px; }
+  h2 { margin: 36px 0 12px 0; font-size: 19px;
+       border-bottom: 2px solid #e0e3e8; padding-bottom: 6px; }
+  .meta { color: #5a6172; font-size: 13px; margin-bottom: 24px; }
+  .meta strong { color: #222; }
+  table { width: 100%; border-collapse: collapse; background: white;
+          border-radius: 6px; overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06); font-size: 13px; }
+  th { background: #2c3038; color: white; text-align: left;
+       padding: 10px 12px; cursor: pointer; user-select: none;
+       font-weight: 600; white-space: nowrap; }
+  th:hover { background: #3a3f48; }
+  th.sorted-asc::after  { content: " \25B2"; opacity: 0.7; }
+  th.sorted-desc::after { content: " \25BC"; opacity: 0.7; }
+  td { padding: 8px 12px; border-bottom: 1px solid #eef0f3; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  tr:hover td { background: #eaf3ff; }
+  .mode-kafka  { color: #1976d2; font-weight: 600; }
+  .mode-direct { color: #c62828; font-weight: 600; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pill { padding: 2px 8px; border-radius: 999px; font-size: 11px;
+          background: #e8eef7; color: #1976d2; }
+  .pill.bad { background: #fde7e7; color: #c62828; }
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr;
+                gap: 16px; margin-top: 12px; }
+  .chart-card { background: white; padding: 18px; border-radius: 6px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.06); height: 320px;
+                position: relative; }
+  .chart-card.full { grid-column: 1 / -1; height: 360px; }
+  .chart-card h3 { margin: 0 0 10px 0; font-size: 14px;
+                   color: #5a6172; font-weight: 600; }
+  .empty { color: #999; font-style: italic; padding: 20px;
+           text-align: center; }
+  @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>NIDSaaS Load Test Dashboard</h1>
+<p class="meta">
+  Generated 2026-04-25 16:53:34 &middot;
+  <strong>12</strong> runs total &middot;
+  <span class="mode-kafka">6 kafka</span> &middot;
+  <span class="mode-direct">6 direct_http</span>
+</p>
+
+<h2>Summary table</h2>
+<table id="summary-table">
+  <thead>
+    <tr>
+      <th data-key="scenario">Scenario</th>
+      <th data-key="mode">Mode</th>
+      <th data-key="sent" class="num">Sent</th>
+      <th data-key="accepted" class="num">Accepted</th>
+      <th data-key="delivered" class="num">Delivered</th>
+      <th data-key="delivery_rate" class="num">Delivery %</th>
+      <th data-key="p50" class="num">p50 (ms)</th>
+      <th data-key="p95" class="num">p95 (ms)</th>
+      <th data-key="p99" class="num">p99 (ms)</th>
+      <th data-key="max" class="num">max (ms)</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<h2>E1 &mdash; throughput sweep (single tenant)</h2>
+<div class="chart-grid">
+  <div class="chart-card"><h3>p50 latency vs target rate</h3><canvas id="chart-e1-p50"></canvas></div>
+  <div class="chart-card"><h3>p95 latency vs target rate</h3><canvas id="chart-e1-p95"></canvas></div>
+  <div class="chart-card"><h3>p99 latency vs target rate</h3><canvas id="chart-e1-p99"></canvas></div>
+  <div class="chart-card"><h3>max latency vs target rate</h3><canvas id="chart-e1-max"></canvas></div>
+</div>
+
+<h2>E2 &mdash; noisy-neighbour delivery rate by tenant</h2>
+<div class="chart-grid">
+  <div class="chart-card full">
+    <h3>Delivery rate per tenant (kafka vs direct_http)</h3>
+    <canvas id="chart-e2-delivery"></canvas>
+  </div>
+</div>
+
+<h2>E5 &mdash; resource footprint</h2>
+<div class="chart-grid">
+  <div class="chart-card"><h3>Mean CPU % per container</h3><canvas id="chart-e5-cpu"></canvas></div>
+  <div class="chart-card"><h3>Mean RSS (MiB) per container</h3><canvas id="chart-e5-rss"></canvas></div>
+</div>
+
+<script>
+const RUNS = [{"scenario":"e1_rate5","mode":"direct_http","sent":150,"accepted":150,"deduped":0,"delivered":150,"p50":11.42120361328125,"p95":14.987468719482422,"p99":18.44191551208496,"max":18.466949462890625,"per_tenant":{"acme":{"sent":150,"delivered":150,"delivery_rate":1.0,"latency_ms":{"n":150,"p50":11.42120361328125,"p95":14.987468719482422,"p99":18.44191551208496,"max":18.466949462890625,"mean":10.903727213541666}}},"resource":{},"started_at":1777106047.5640528,"notes":"E1 throughput sweep: tenant=acme rate=5.0rps payload=csv duration=30.0s","file":"e1_rate5_direct_http_20260425T083407Z.json"},{"scenario":"e1_rate5","mode":"kafka","sent":150,"accepted":150,"deduped":0,"delivered":150,"p50":12.054204940795898,"p95":17.067909240722656,"p99":18.663883209228516,"max":22.30525016784668,"per_tenant":{"acme":{"sent":150,"delivered":150,"delivery_rate":1.0,"latency_ms":{"n":150,"p50":12.054204940795898,"p95":17.067909240722656,"p99":18.663883209228516,"max":22.30525016784668,"mean":12.001876831054688}}},"resource":{},"started_at":1777105852.2049897,"notes":"E1 throughput sweep: tenant=acme rate=5.0rps payload=csv duration=30.0s","file":"e1_rate5_kafka_20260425T083052Z.json"},{"scenario":"e1_rate20","mode":"direct_http","sent":600,"accepted":600,"deduped":0,"delivered":600,"p50":9.985208511352539,"p95":15.704154968261719,"p99":17.714977264404297,"max":1141.239881515503,"per_tenant":{"acme":{"sent":600,"delivered":600,"delivery_rate":1.0,"latency_ms":{"n":600,"p50":9.985208511352539,"p95":15.704154968261719,"p99":17.714977264404297,"max":1141.239881515503,"mean":11.942683458328247}}},"resource":{},"started_at":1777106095.1614137,"notes":"E1 throughput sweep: tenant=acme rate=20.0rps payload=csv duration=30.0s","file":"e1_rate20_direct_http_20260425T083455Z.json"},{"scenario":"e1_rate20","mode":"kafka","sent":600,"accepted":600,"deduped":0,"delivered":600,"p50":12.128353118896484,"p95":15.762090682983398,"p99":18.81265640258789,"max":1111.020565032959,"per_tenant":{"acme":{"sent":600,"delivered":600,"delivery_rate":1.0,"latency_ms":{"n":600,"p50":12.128353118896484,"p95":15.762090682983398,"p99":18.81265640258789,"max":1111.020565032959,"mean":13.057491779327393}}},"resource":{},"started_at":1777105899.3108478,"notes":"E1 throughput sweep: tenant=acme rate=20.0rps payload=csv duration=30.0s","file":"e1_rate20_kafka_20260425T083139Z.json"},{"scenario":"e1_rate50","mode":"direct_http","sent":1500,"accepted":1500,"deduped":0,"delivered":1500,"p50":11.845111846923828,"p95":18.24498176574707,"p99":27.23860740661621,"max":1086.7605209350586,"per_tenant":{"acme":{"sent":1500,"delivered":1500,"delivery_rate":1.0,"latency_ms":{"n":1500,"p50":11.845111846923828,"p95":18.24498176574707,"p99":27.23860740661621,"max":1086.7605209350586,"mean":12.449178059895834}}},"resource":{},"started_at":1777106139.1008716,"notes":"E1 throughput sweep: tenant=acme rate=50.0rps payload=csv duration=30.0s","file":"e1_rate50_direct_http_20260425T083539Z.json"},{"scenario":"e1_rate50","mode":"kafka","sent":1500,"accepted":1500,"deduped":0,"delivered":1500,"p50":14.392375946044922,"p95":18.945932388305664,"p99":22.273778915405273,"max":33.3552360534668,"per_tenant":{"acme":{"sent":1500,"delivered":1500,"delivery_rate":1.0,"latency_ms":{"n":1500,"p50":14.392375946044922,"p95":18.945932388305664,"p99":22.273778915405273,"max":33.3552360534668,"mean":13.475535074869791}}},"resource":{},"started_at":1777105943.3731313,"notes":"E1 throughput sweep: tenant=acme rate=50.0rps payload=csv duration=30.0s","file":"e1_rate50_kafka_20260425T083223Z.json"},{"scenario":"e1_rate100","mode":"direct_http","sent":3000,"accepted":3000,"deduped":0,"delivered":3000,"p50":11.644840240478516,"p95":27.08578109741211,"p99":38.37299346923828,"max":2095.13521194458,"per_tenant":{"acme":{"sent":3000,"delivered":3000,"delivery_rate":1.0,"latency_ms":{"n":3000,"p50":11.644840240478516,"p95":27.08578109741211,"p99":38.37299346923828,"max":2095.13521194458,"mean":15.11617906888326}}},"resource":{},"started_at":1777106183.3043325,"notes":"E1 throughput sweep: tenant=acme rate=100.0rps payload=csv duration=30.0s","file":"e1_rate100_direct_http_20260425T083623Z.json"},{"scenario":"e1_rate100","mode":"kafka","sent":3000,"accepted":3000,"deduped":0,"delivered":3000,"p50":14.376163482666016,"p95":37.580251693725586,"p99":47.591209411621094,"max":2098.8340377807617,"per_tenant":{"acme":{"sent":3000,"delivered":3000,"delivery_rate":1.0,"latency_ms":{"n":3000,"p50":14.376163482666016,"p95":37.580251693725586,"p99":47.591209411621094,"max":2098.8340377807617,"mean":20.214565594991047}}},"resource":{},"started_at":1777105990.607924,"notes":"E1 throughput sweep: tenant=acme rate=100.0rps payload=csv duration=30.0s","file":"e1_rate100_kafka_20260425T083310Z.json"},{"scenario":"e2_noisy_neighbour","mode":"direct_http","sent":5105,"accepted":2378,"deduped":0,"delivered":2378,"p50":575.0367641448975,"p95":2758.4915161132812,"p99":44258.82697105408,"max":140583.49704742432,"per_tenant":{"globex":{"sent":5001,"delivered":2320,"delivery_rate":0.46390721855628875,"latency_ms":{"n":2320,"p50":574.8872756958008,"p95":2849.320411682129,"p99":44261.42454147339,"max":140583.49704742432,"mean":1671.4333905228252}},"acme":{"sent":104,"delivered":58,"delivery_rate":0.5576923076923077,"latency_ms":{"n":58,"p50":576.7147541046143,"p95":1998.6250400543213,"p99":2477.691411972046,"max":8961.092948913574,"mean":869.293032021358}}},"resource":{},"started_at":1777108475.216681,"notes":"E2 noisy-neighbour: quiet=acme@5.0rps noisy=globex@200.0rps duration=60.0s","file":"e2_noisy_neighbour_direct_http_20260425T091435Z.json"},{"scenario":"e2_noisy_neighbour","mode":"kafka","sent":12300,"accepted":12300,"deduped":0,"delivered":11683,"p50":7555.493354797363,"p95":16105.233669281006,"p99":17829.28514480591,"max":19079.836130142212,"per_tenant":{"acme":{"sent":300,"delivered":299,"delivery_rate":0.9966666666666667,"latency_ms":{"n":299,"p50":6477.37193107605,"p95":13545.680284500122,"p99":15121.778011322021,"max":15705.184936523438,"mean":6419.136048958055}},"globex":{"sent":12000,"delivered":11384,"delivery_rate":0.9486666666666667,"latency_ms":{"n":11384,"p50":7611.167669296265,"p95":16126.658916473389,"p99":17843.445777893066,"max":19079.836130142212,"mean":7486.68024450729}}},"resource":{},"started_at":1777108383.7214015,"notes":"E2 noisy-neighbour: quiet=acme@5.0rps noisy=globex@200.0rps duration=60.0s","file":"e2_noisy_neighbour_kafka_20260425T091303Z.json"},{"scenario":"e5_resource_footprint","mode":"direct_http","sent":9000,"accepted":9000,"deduped":0,"delivered":9000,"p50":26.068449020385742,"p95":452.8765678405762,"p99":687.9456043243408,"max":2106.87255859375,"per_tenant":{"globex":{"sent":3000,"delivered":3000,"delivery_rate":1.0,"latency_ms":{"n":3000,"p50":27.545928955078125,"p95":452.8360366821289,"p99":692.7587985992432,"max":2106.87255859375,"mean":86.71355358759563}},"initech":{"sent":3000,"delivered":3000,"delivery_rate":1.0,"latency_ms":{"n":3000,"p50":27.071714401245117,"p95":459.58971977233887,"p99":724.3342399597168,"max":2106.707811355591,"mean":88.54408303896587}},"acme":{"sent":3000,"delivered":3000,"delivery_rate":1.0,"latency_ms":{"n":3000,"p50":23.181438446044922,"p95":444.74077224731445,"p99":665.804386138916,"max":1647.5903987884521,"mean":83.01721239089966}}},"resource":{"nidsaas_gateway":{"cpu_mean":82.08333333333333,"cpu_max":115.54,"rss_mean_mib":49.66809523809523,"rss_max_mib":50.66,"samples":21},"nidsaas_detector":{"cpu_mean":52.969047619047615,"cpu_max":72.04,"rss_mean_mib":51.94285714285714,"rss_max_mib":52.56,"samples":21},"nidsaas_flow_extractor":{"cpu_mean":0.89,"cpu_max":1.23,"rss_mean_mib":64.92190476190477,"rss_max_mib":64.93,"samples":21},"nidsaas_snort_sidecar":{"cpu_mean":0.7704761904761904,"cpu_max":1.24,"rss_mean_mib":39.44190476190476,"rss_max_mib":39.68,"samples":21},"nidsaas_alert_fanout":{"cpu_mean":55.91428571428572,"cpu_max":71.9,"rss_mean_mib":43.28523809523809,"rss_max_mib":43.84,"samples":21},"nidsaas_kafka":{"cpu_mean":58.62,"cpu_max":235.33,"rss_mean_mib":1091.3889523809526,"rss_max_mib":1147.904,"samples":21},"nidsaas_webhook_receiver":{"cpu_mean":22.77095238095238,"cpu_max":29.5,"rss_mean_mib":53.513333333333335,"rss_max_mib":53.68,"samples":21}},"started_at":1777109462.5229714,"notes":"E5 resource footprint: tenants=['acme', 'globex', 'initech'] rate=50.0rps duration=60.0s","file":"e5_resource_footprint_direct_http_20260425T093102Z.json"},{"scenario":"e5_resource_footprint","mode":"kafka","sent":9000,"accepted":9000,"deduped":0,"delivered":9000,"p50":42.819976806640625,"p95":523.5650539398193,"p99":925.7364273071289,"max":2175.388813018799,"per_tenant":{"globex":{"sent":3000,"delivered":3000,"delivery_rate":1.0,"latency_ms":{"n":3000,"p50":43.76816749572754,"p95":523.2672691345215,"p99":1047.7790832519531,"max":2160.146951675415,"mean":111.15498240788777}},"initech":{"sent":3000,"delivered":3000,"delivery_rate":1.0,"latency_ms":{"n":3000,"p50":39.89386558532715,"p95":531.1305522918701,"p99":833.6808681488037,"max":2171.119213104248,"mean":103.5419069925944}},"acme":{"sent":3000,"delivered":3000,"delivery_rate":1.0,"latency_ms":{"n":3000,"p50":44.49343681335449,"p95":523.5650539398193,"p99":884.70458984375,"max":2175.388813018799,"mean":108.43520879745483}}},"resource":{"nidsaas_gateway":{"cpu_mean":53.807500000000005,"cpu_max":83.85,"rss_mean_mib":49.507,"rss_max_mib":50.84,"samples":20},"nidsaas_detector":{"cpu_mean":36.808499999999995,"cpu_max":57.29,"rss_mean_mib":51.521,"rss_max_mib":51.62,"samples":20},"nidsaas_flow_extractor":{"cpu_mean":0.9385,"cpu_max":1.36,"rss_mean_mib":64.934,"rss_max_mib":65.17,"samples":20},"nidsaas_snort_sidecar":{"cpu_mean":0.7985,"cpu_max":1.33,"rss_mean_mib":39.43,"rss_max_mib":39.43,"samples":20},"nidsaas_alert_fanout":{"cpu_mean":60.239,"cpu_max":79.8,"rss_mean_mib":43.096500000000006,"rss_max_mib":43.56,"samples":20},"nidsaas_kafka":{"cpu_mean":121.66749999999999,"cpu_max":261.68,"rss_mean_mib":1097.0624,"rss_max_mib":1148.928,"samples":20},"nidsaas_webhook_receiver":{"cpu_mean":25.885,"cpu_max":38.64,"rss_mean_mib":48.8955,"rss_max_mib":49.07,"samples":20}},"started_at":1777109368.947944,"notes":"E5 resource footprint: tenants=['acme', 'globex', 'initech'] rate=50.0rps duration=60.0s","file":"e5_resource_footprint_kafka_20260425T092928Z.json"}];
+
+const KAFKA_COLOR  = '#1976d2';
+const DIRECT_COLOR = '#c62828';
+
+function deliveryRate(r) {
+  return r.sent > 0 ? (r.delivered / r.sent * 100) : 0;
+}
+
+function fmtNum(x, digits) {
+  if (x === null || x === undefined || Number.isNaN(x)) return '-';
+  return Number(x).toFixed(digits ?? 1);
+}
+
+// --- summary table ---
+function renderRow(r) {
+  const dRate = deliveryRate(r);
+  const modeCls = r.mode === 'kafka' ? 'mode-kafka' : 'mode-direct';
+  const dPillCls = dRate >= 99 ? 'pill' : 'pill bad';
+  return `<tr>
+    <td>${r.scenario}</td>
+    <td class="${modeCls}">${r.mode}</td>
+    <td class="num">${r.sent}</td>
+    <td class="num">${r.accepted}</td>
+    <td class="num">${r.delivered}</td>
+    <td class="num"><span class="${dPillCls}">${fmtNum(dRate, 1)}%</span></td>
+    <td class="num">${fmtNum(r.p50)}</td>
+    <td class="num">${fmtNum(r.p95)}</td>
+    <td class="num">${fmtNum(r.p99)}</td>
+    <td class="num">${fmtNum(r.max)}</td>
+  </tr>`;
+}
+
+const tbody = document.querySelector('#summary-table tbody');
+let sortKey = null, sortDir = 1;
+
+function rerender(rows) {
+  tbody.innerHTML = rows.map(renderRow).join('');
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir = -sortDir;
+  else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll('#summary-table th').forEach(th => {
+    th.classList.remove('sorted-asc', 'sorted-desc');
+    if (th.dataset.key === key)
+      th.classList.add(sortDir > 0 ? 'sorted-asc' : 'sorted-desc');
+  });
+  const sorted = RUNS.slice().sort((a, b) => {
+    let va, vb;
+    if (key === 'delivery_rate') {
+      va = deliveryRate(a); vb = deliveryRate(b);
+    } else {
+      va = a[key]; vb = b[key];
+    }
+    if (typeof va === 'string') return va.localeCompare(vb) * sortDir;
+    return ((va ?? 0) - (vb ?? 0)) * sortDir;
+  });
+  rerender(sorted);
+}
+
+document.querySelectorAll('#summary-table th').forEach(th => {
+  th.addEventListener('click', () => sortBy(th.dataset.key));
+});
+rerender(RUNS);
+
+// --- E1 line charts ---
+function rateFromScenario(s) {
+  const m = /e1_rate(\d+)/.exec(s);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+const e1 = RUNS.filter(r => /^e1_rate\d+$/.test(r.scenario));
+const e1Rates = [...new Set(e1.map(r => rateFromScenario(r.scenario)))].sort((a, b) => a - b);
+
+function e1Chart(canvasId, metric) {
+  const dataFor = (mode) => e1Rates.map(rate => {
+    const r = e1.find(x => x.mode === mode && rateFromScenario(x.scenario) === rate);
+    return r ? r[metric] : null;
+  });
+  new Chart(document.getElementById(canvasId), {
+    type: 'line',
+    data: {
+      labels: e1Rates.map(r => r + ' rps'),
+      datasets: [
+        { label: 'kafka',
+          data: dataFor('kafka'),
+          borderColor: KAFKA_COLOR,
+          backgroundColor: KAFKA_COLOR + '22',
+          tension: 0.2 },
+        { label: 'direct_http',
+          data: dataFor('direct_http'),
+          borderColor: DIRECT_COLOR,
+          backgroundColor: DIRECT_COLOR + '22',
+          tension: 0.2 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        y: { title: { display: true, text: 'ms' }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+if (e1Rates.length > 0) {
+  e1Chart('chart-e1-p50', 'p50');
+  e1Chart('chart-e1-p95', 'p95');
+  e1Chart('chart-e1-p99', 'p99');
+  e1Chart('chart-e1-max', 'max');
+} else {
+  ['chart-e1-p50', 'chart-e1-p95', 'chart-e1-p99', 'chart-e1-max'].forEach(id => {
+    const c = document.getElementById(id);
+    c.parentElement.innerHTML = '<div class="empty">No E1 runs found.</div>';
+  });
+}
+
+// --- E2 per-tenant delivery rate ---
+const e2 = RUNS.filter(r => r.scenario === 'e2_noisy_neighbour');
+if (e2.length > 0) {
+  const tenants = [...new Set(
+    e2.flatMap(r => Object.keys(r.per_tenant || {}))
+  )].sort();
+  const dataMode = (mode) => tenants.map(t => {
+    const r = e2.find(x => x.mode === mode);
+    if (!r || !r.per_tenant[t]) return null;
+    return (r.per_tenant[t].delivery_rate || 0) * 100;
+  });
+  new Chart(document.getElementById('chart-e2-delivery'), {
+    type: 'bar',
+    data: {
+      labels: tenants,
+      datasets: [
+        { label: 'kafka',
+          data: dataMode('kafka'),
+          backgroundColor: KAFKA_COLOR },
+        { label: 'direct_http',
+          data: dataMode('direct_http'),
+          backgroundColor: DIRECT_COLOR },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        y: { title: { display: true, text: 'delivery rate (%)' },
+             beginAtZero: true, max: 100 }
+      }
+    }
+  });
+} else {
+  document.getElementById('chart-e2-delivery').parentElement.innerHTML =
+    '<div class="empty">No E2 runs found.</div>';
+}
+
+// --- E5 resource ---
+const e5 = RUNS.filter(r =>
+  r.scenario === 'e5_resource_footprint' &&
+  r.resource && Object.keys(r.resource).length > 0
+);
+
+if (e5.length > 0) {
+  const containers = [...new Set(
+    e5.flatMap(r => Object.keys(r.resource))
+  )].sort();
+  const cpu = (mode) => containers.map(c => {
+    const r = e5.find(x => x.mode === mode);
+    return r && r.resource[c] ? r.resource[c].cpu_mean : null;
+  });
+  const rss = (mode) => containers.map(c => {
+    const r = e5.find(x => x.mode === mode);
+    return r && r.resource[c] ? r.resource[c].rss_mean_mib : null;
+  });
+
+  new Chart(document.getElementById('chart-e5-cpu'), {
+    type: 'bar',
+    data: {
+      labels: containers,
+      datasets: [
+        { label: 'kafka',
+          data: cpu('kafka'),
+          backgroundColor: KAFKA_COLOR },
+        { label: 'direct_http',
+          data: cpu('direct_http'),
+          backgroundColor: DIRECT_COLOR },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { y: { title: { display: true, text: 'CPU mean (%)' },
+                     beginAtZero: true } }
+    }
+  });
+
+  new Chart(document.getElementById('chart-e5-rss'), {
+    type: 'bar',
+    data: {
+      labels: containers,
+      datasets: [
+        { label: 'kafka',
+          data: rss('kafka'),
+          backgroundColor: KAFKA_COLOR },
+        { label: 'direct_http',
+          data: rss('direct_http'),
+          backgroundColor: DIRECT_COLOR },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { y: { title: { display: true, text: 'RSS mean (MiB)' },
+                     beginAtZero: true } }
+    }
+  });
+} else {
+  document.getElementById('chart-e5-cpu').parentElement.innerHTML =
+    '<div class="empty">No E5 runs found (E5 requires <code>--mode e5</code> with docker stats).</div>';
+  document.getElementById('chart-e5-rss').parentElement.innerHTML = '';
+}
+</script>
+
+</body>
+</html>

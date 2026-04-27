@@ -1,0 +1,60 @@
+# Overlay compose file for the Spark microbenchmark experiment.
+# Brings up a single Spark Structured Streaming worker that subscribes
+# to spark.probe.in and republishes onto spark.probe.out.
+#
+# Run with the main stack:
+#
+#   cd prototype
+#   docker compose \
+#       -f docker-compose.yml \
+#       -f spark_experiment/docker-compose.spark.yml \
+#       up -d
+#
+# The Spark service joins the existing `nidsaas` network, so it can
+# reach the Kafka broker via hostname `kafka:9092`.
+
+services:
+  spark_probe:
+    build:
+      context: ./spark_experiment
+    container_name: nidsaas_spark_probe
+    depends_on:
+      kafka:
+        condition: service_healthy
+      spark_topic_init:
+        condition: service_completed_successfully
+    environment:
+      KAFKA_BOOTSTRAP: "kafka:9092"
+      SPARK_PROBE_TOPIC_IN:  "spark.probe.in"
+      SPARK_PROBE_TOPIC_OUT: "spark.probe.out"
+      SPARK_TRIGGER_MS: "100"        # micro-batch interval
+      SPARK_CHECKPOINT_DIR: "/tmp/spark-checkpoint"
+    networks: [nidsaas]
+    restart: unless-stopped
+
+  spark_topic_init:
+    image: apache/kafka:3.9.0
+    container_name: nidsaas_spark_topic_init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    # docker-compose v2+ interprets $VAR before passing to the shell; double
+    # the dollar sign so bash receives a literal $t for the loop variable.
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -e
+        for t in spark.probe.in spark.probe.out direct.probe; do
+          if /opt/kafka/bin/kafka-topics.sh \
+               --bootstrap-server kafka:9092 --list | grep -qx "$$t"; then
+            echo "[spark_topic_init] exists: $$t"
+          else
+            /opt/kafka/bin/kafka-topics.sh \
+              --bootstrap-server kafka:9092 \
+              --create --topic "$$t" \
+              --partitions 1 --replication-factor 1
+            echo "[spark_topic_init] created: $$t"
+          fi
+        done
+    networks: [nidsaas]
+    restart: "no"

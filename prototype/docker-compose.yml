@@ -1,0 +1,179 @@
+# NIDSaaS prototype — minimal end-to-end stack.
+# Bring up with:  docker compose up --build
+#
+# Services:
+#   kafka            - KRaft single-node broker (no Zookeeper)
+#   topic_init       - one-shot: creates tenant.*.raw / .alerts / .signature topics
+#   gateway          - FastAPI ingestion, OAuth2 client-credentials -> Kafka producer
+#   detector         - aiokafka streaming worker: Tier-1 rate rules + signature fast
+#                      path; Tier-2 RF+Conformal + HistGB gate with val-calibrated
+#                      threshold tau*.
+#   flow_extractor   - CICFlowMeter v4 sidecar: consumes tenant.{u}.pcap_chunks,
+#                      runs CICFlowMeter, republishes flows to tenant.{u}.raw.
+#                      Only does work in pcap mode; idle in CSV mode.
+#   alert_fanout     - consumes tenant.*.alerts, POSTs to registered tenant webhooks
+#   webhook_receiver - echo sink that plays the role of a tenant SIEM
+#   snort_sidecar    - Snort 3, replays pcaps via daq_file and publishes signature
+#                      hits to tenant.{u}.signature
+#   tenant_simulator - CSV mode (default): replays CIC-IDS2017 flow rows via /ingest
+#                      pcap mode (SIM_MODE=pcap): slices pcaps and POSTs chunks to
+#                      /ingest_pcap -- exercises the full Figure-1 pipeline.
+
+version: "3.9"
+
+networks:
+  nidsaas:
+    driver: bridge
+
+volumes:
+  kafka_data:
+
+services:
+  # -------------------------------------------------------------------------
+  kafka:
+    image: apache/kafka:3.9.0
+    container_name: nidsaas_kafka
+    restart: unless-stopped
+    ports:
+      - "19092:19092"         # external bootstrap for host tools (kcat, etc.)
+    environment:
+      # KRaft single-node (controller + broker in one process)
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: "controller,broker"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_LISTENERS: "INTERNAL://:9092,EXTERNAL://:19092,CONTROLLER://:9093"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:9092,EXTERNAL://localhost:19092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      # Single-broker dev overrides so topics create with RF=1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+      # Pcap chunks can be up to ~8 MB; give the broker headroom above that.
+      KAFKA_MESSAGE_MAX_BYTES: "16777216"
+      KAFKA_REPLICA_FETCH_MAX_BYTES: "16777216"
+      KAFKA_SOCKET_REQUEST_MAX_BYTES: "20971520"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks: [nidsaas]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # -------------------------------------------------------------------------
+  topic_init:
+    image: apache/kafka:3.9.0
+    container_name: nidsaas_topic_init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    env_file: .env
+    volumes:
+      - ./init/create_topics.sh:/create_topics.sh:ro
+    entrypoint: ["/bin/bash", "/create_topics.sh"]
+    user: "0"
+    networks: [nidsaas]
+    restart: "no"
+
+  # -------------------------------------------------------------------------
+  gateway:
+    build: ./gateway
+    container_name: nidsaas_gateway
+    depends_on:
+      topic_init:
+        condition: service_completed_successfully
+    env_file: .env
+    ports:
+      - "8080:8080"
+    networks: [nidsaas]
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------------
+  detector:
+    build: ./streaming_worker
+    container_name: nidsaas_detector
+    depends_on:
+      topic_init:
+        condition: service_completed_successfully
+    env_file: .env
+    # 8083 only needs to be reachable on the internal network in
+    # direct_http baseline mode; expose it on localhost too so a host
+    # operator can probe /healthz without docker exec.
+    ports:
+      - "8083:8083"
+    volumes:
+      # Reuse the research pipeline modules + locked artefacts as-is.
+      - ../pipeline:/opt/pipeline:ro
+      - ./models:/models:ro
+    networks: [nidsaas]
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------------
+  flow_extractor:
+    build: ./flow_extractor
+    container_name: nidsaas_flow_extractor
+    depends_on:
+      topic_init:
+        condition: service_completed_successfully
+    env_file: .env
+    ports:
+      - "8081:8081"
+    networks: [nidsaas]
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------------
+  alert_fanout:
+    build: ./alert_fanout
+    container_name: nidsaas_alert_fanout
+    depends_on:
+      topic_init:
+        condition: service_completed_successfully
+    env_file: .env
+    ports:
+      - "8084:8084"
+    networks: [nidsaas]
+    restart: unless-stopped
+
+  webhook_receiver:
+    build: ./webhook_receiver
+    container_name: nidsaas_webhook_receiver
+    env_file: .env
+    ports:
+      - "9000:9000"
+    networks: [nidsaas]
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------------
+  snort_sidecar:
+    build: ./snort_sidecar
+    container_name: nidsaas_snort_sidecar
+    depends_on:
+      topic_init:
+        condition: service_completed_successfully
+    env_file: .env
+    ports:
+      - "8082:8082"
+    # No disk pcap mount needed — the sidecar consumes tenant.{u}.pcap_chunks
+    # off Kafka (kafka mode) or accepts chunks via POST /process_chunk
+    # (direct_http mode). Same Snort 3 invocation in either case.
+    networks: [nidsaas]
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------------
+  tenant_simulator:
+    build: ./tenant_simulator
+    container_name: nidsaas_tenant_simulator
+    depends_on:
+      gateway:
+        condition: service_started
+    env_file: .env
+    volumes:
+      - ../csv_CIC_IDS2017:/csv:ro
+      - ../pcap_CIC_IDS2017:/pcaps:ro
+    networks: [nidsaas]
+    restart: "no"
