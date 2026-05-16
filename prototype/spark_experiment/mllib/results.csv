@@ -1,0 +1,8 @@
+engine,input_file,n_rows,n_cols,on_disk_mb,n_estimators,max_depth,n_jobs,load_time_sec,train_time_sec,predict_time_sec,peak_rss_mb,accuracy,precision,recall,f1
+sklearn,0.5gb.parquet,4194304,80,1335.1,100,15,-1,5.04,620.39,1.73,13269.2,1.0,1.0,1.0,1.0
+sklearn,0.1gb.parquet,838860,80,273.1,100,15,-1,1.3,93.82,0.31,2791.0,1.0,1.0,0.9999,1.0
+sklearn,0.25gb.parquet,2097152,80,667.0,100,15,-1,0.37,274.78,0.74,6738.3,1.0,1.0,1.0,1.0
+spark_mllib,0.5gb.parquet,4194304,80,1335.1,100,15,12,4.11,395.08,10.46,0,1.0,1.0,1.0,1.0
+spark_mllib,0.1gb.parquet,838860,80,273.1,100,15,12,4.18,124.52,3.72,0.0,1.0,1.0,1.0,1.0
+spark_mllib,0.25gb.parquet,2097152,80,667.0,100,15,12,2.99,162.66,5.21,0.0,1.0,1.0,1.0,1.0
+    

@@ -49,6 +49,34 @@ ATTACK_NORMALIZATION = {
     "dos goldeneye": "DoS GoldenEye",
     "dos slowhttptest": "DoS Slowhttptest",
     "dos slowloris": "DoS slowloris",
+    # Lycos2017 (Rosay et al. 2021 corrected CIC-IDS2017) — snake_case labels
+    "ftp_patator": "FTP-Patator",
+    "ssh_patator": "SSH-Patator",
+    "dos_hulk": "DoS Hulk",
+    "dos_goldeneye": "DoS GoldenEye",
+    "dos_slowhttptest": "DoS Slowhttptest",
+    "dos_slowloris": "DoS slowloris",
+    "botnet": "Bot",
+    "web_attack_brute_force": "Web Attack - Brute Force",
+    "web_attack_xss": "Web Attack - XSS",
+    "web_attack_sql_injection": "Web Attack - Sql Injection",
+    "web_attack___brute_force": "Web Attack - Brute Force",
+    "web_attack___xss": "Web Attack - XSS",
+    "web_attack___sql_injection": "Web Attack - Sql Injection",
+    "webattack_bruteforce": "Web Attack - Brute Force",
+    "webattack_xss": "Web Attack - XSS",
+    "webattack_sql_injection": "Web Attack - Sql Injection",
+    # UNSW-NB15 (Moustafa & Slay 2015) — IXIA PerfectStorm attack families
+    "generic": "Generic",
+    "exploits": "Exploits",
+    "fuzzers": "Fuzzers",
+    "dos": "DoS",
+    "reconnaissance": "Reconnaissance",
+    "analysis": "Analysis",
+    "backdoor": "Backdoor",
+    "backdoors": "Backdoor",
+    "shellcode": "Shellcode",
+    "worms": "Worms",
 }
 
 
@@ -130,28 +158,31 @@ def infer_numeric_and_categorical(df: pd.DataFrame, feature_columns: Iterable[st
             categorical_cols.append(col)
     return numeric_cols, categorical_cols
 
-
 def align_prediction_to_rows(n_rows: int, seq_len: int, seq_scores: np.ndarray) -> np.ndarray:
     if n_rows == 0:
-        return np.array([], dtype=float)
-    if len(seq_scores) == 0:
+        return np.zeros(0, dtype=float)
+    if seq_scores.size == 0:
         return np.zeros(n_rows, dtype=float)
-    row_scores = np.full(n_rows, seq_scores[0], dtype=float)
-    start = seq_len - 1
-    row_scores[start : start + len(seq_scores)] = seq_scores
-    return row_scores
-
+    out = np.zeros(n_rows, dtype=float)
+    counts = np.zeros(n_rows, dtype=np.int64)
+    for i, s in enumerate(seq_scores):
+        end = min(i + seq_len, n_rows)
+        out[i:end] += float(s)
+        counts[i:end] += 1
+    counts = np.where(counts == 0, 1, counts)
+    return out / counts
 
 def set_random_seed(seed: int) -> None:
-    import random
-
-    random.seed(seed)
-    np.random.seed(seed)
+    """Set numpy + python random seeds. PyTorch seed is set if torch is
+    available (no hard dependency)."""
+    import random as _py_random
+    _py_random.seed(int(seed))
+    np.random.seed(int(seed))
     try:
-        import torch
-
-        torch.manual_seed(seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(seed)
-    except Exception:
+        import torch as _torch  # type: ignore
+        _torch.manual_seed(int(seed))
+        if _torch.cuda.is_available():
+            _torch.cuda.manual_seed_all(int(seed))
+    except ImportError:
         pass
+

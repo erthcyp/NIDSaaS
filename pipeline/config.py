@@ -36,6 +36,7 @@ class RFConfig:
     use_calibrated_threshold: bool = False
 
     exclude_columns: Tuple[str, ...] = (
+        # CIC-IDS2017 identity / metadata
         "Flow ID",
         "flow_id",
         "Source IP",
@@ -46,6 +47,19 @@ class RFConfig:
         "timestamp",
         "SimillarHTTP",
         "simillarhttp",
+        # Lycos2017 (Rosay et al. 2021) identity / metadata
+        "src_addr",
+        "dst_addr",
+        "src_port",
+        "dst_port",
+        "ip_prot",
+        # UNSW-NB15 (Moustafa & Slay 2015) identity / metadata
+        "srcip",
+        "sport",
+        "dstip",
+        "dsport",
+        "Stime",
+        "Ltime",
     )
 
 
@@ -75,6 +89,19 @@ class LSTMConfig:
         "timestamp",
         "SimillarHTTP",
         "simillarhttp",
+        # Lycos2017 identity / metadata
+        "src_addr",
+        "dst_addr",
+        "src_port",
+        "dst_port",
+        "ip_prot",
+        # UNSW-NB15 (Moustafa & Slay 2015) identity / metadata
+        "srcip",
+        "sport",
+        "dstip",
+        "dsport",
+        "Stime",
+        "Ltime",
     )
 
 

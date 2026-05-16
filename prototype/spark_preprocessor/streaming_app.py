@@ -58,18 +58,21 @@ TRIGGER_MS      = int(os.environ.get("SPARK_TRIGGER_MS", "100"))
 CHECKPOINT_DIR  = os.environ.get("SPARK_CHECKPOINT_DIR", "/tmp/spark-checkpoint-prep")
 
 
-# Schema of the gateway's FlowRecord JSON published to tenant.*.raw.
-# Matches gateway/app.py::FlowRecord (with fields the gateway adds at
-# ingest time: tenant, ingest_ts, trace_id).
+# Schema of the JSON we read from tenant.*.raw. Both producers feed this
+# topic — the gateway (when /ingest is hit by the dashboard buttons) and
+# the flow_extractor sidecar (when /ingest_pcap is hit by send_pcap.py).
+# CICFlowMeter's CSV columns include string-valued fields like the flow
+# 5-tuple, so we use MapType(String, String) and accept any feature
+# representation; downstream consumers re-parse what they need.
 FLOW_SCHEMA = StructType([
-    StructField("flow_id",     StringType(),                   True),
-    StructField("source_file", StringType(),                   True),
-    StructField("row_id",      LongType(),                     True),
-    StructField("label",       StringType(),                   True),
-    StructField("features",    MapType(StringType(), DoubleType()), True),
-    StructField("tenant",      StringType(),                   True),
-    StructField("ingest_ts",   DoubleType(),                   True),
-    StructField("trace_id",    StringType(),                   True),
+    StructField("flow_id",     StringType(),                       True),
+    StructField("source_file", StringType(),                       True),
+    StructField("row_id",      LongType(),                         True),
+    StructField("label",       StringType(),                       True),
+    StructField("features",    MapType(StringType(), StringType()), True),
+    StructField("tenant",      StringType(),                       True),
+    StructField("ingest_ts",   DoubleType(),                       True),
+    StructField("trace_id",    StringType(),                       True),
 ])
 
 

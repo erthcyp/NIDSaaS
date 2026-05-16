@@ -1,56 +1,100 @@
-# Python
+# =============================================================
+# NIDSaaS — gitignore
+# Keep code + docs + paper sources. Exclude raw data, model
+# artefacts, virtualenvs, and the cloned external repo.
+# =============================================================
+
+# --- Raw datasets (49 GB pcaps + 2.5 GB CSVs) ---
+pcap_CIC_IDS2017/
+csv_CIC_IDS2017/
+csv_Lycos2017/
+csv_UNSW_NB15/
+
+# --- Cloned external repos ---
+CLOSR/
+
+# --- Frozen tarballs ---
+archive/
+
+# --- All pipeline outputs (model artefacts + prediction CSVs) ---
+pipeline/outputs_*/
+pipeline/_labels_only.csv
+pipeline/signature_merged_predictions.csv
+pipeline/signature_merged_predictions_per_class.csv
+
+# --- Loadtest outputs (50 MB JSON) ---
+prototype/loadtest/outputs/
+prototype/loadtest/figures/
+
+# --- Snort outputs (379 MB CSV) ---
+snort/outputs_snort_eval_v4a/
+snort/outputs_snort_eval_v4a_temporal/
+
+# --- Snort empty signature CSVs (generated on demand) ---
+snort/outputs_snort_eval_v4a/snort_lycos_empty.csv
+snort/outputs_snort_eval_v4a/snort_unsw_empty.csv
+snort/outputs_snort_eval_v4a/snort_empty_cic.csv
+
+# --- Python ---
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
+*.so
+*.egg
 *.egg-info/
+.pytest_cache/
+
+# --- Virtualenvs ---
 .venv/
+.venv-wsl/
 venv/
 env/
+*/.venv/
+*/.venv-wsl/
 
-# Docker
-*.tar
-*.tar.gz
-.dockerignore
+# --- Joblib models / pickled artefacts ---
+*.joblib
+*.joblib.tar
+*.joblib.tar.gz
+*.pt
+*.pt.tar
+*.pkl
 
-# Secrets — never commit
-.env
-.env.local
-*.key
-*.pem
-oauth_secrets.json
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.ipynb_checkpoints
 
-# Generated artefacts
-prototype/loadtest/outputs/*.json
-prototype/loadtest/outputs/*.csv
-prototype/loadtest/runs/
-prototype/spark_experiment/mllib/results.csv
-prototype/spark_experiment/mllib/fig_*.pdf
-prototype/spark_experiment/mllib/fig_*.png
-prototype/models/*.joblib
-prototype/models/*.pkl
-
-# Heavy CSV training byproducts (regenerate from pipeline scripts)
-pipeline/*.csv
-pipeline/outputs_*/
-
-# Snort eval outputs (regenerate from snort_runner.py)
-snort/outputs_*/
-
-# Datasets — too large to commit
-csv_CIC_IDS2017/
-pcap_CIC_IDS2017/
-*.pcap
-*.pcapng
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
+# --- IDE / OS ---
 .vscode/
 .idea/
+.DS_Store
+Thumbs.db
 *.swp
-*.swo
 *~
+
+# --- Logs ---
+*.log
+nohup.out
+unsw_run.log
+baselines_extra.log
+closr_random.log
+
+# --- Compiled LaTeX (keep source, ignore build artefacts) ---
+NIDAAS_overleaf/**/*.aux
+NIDAAS_overleaf/**/*.log
+NIDAAS_overleaf/**/*.out
+NIDAAS_overleaf/**/*.synctex.gz
+NIDAAS_overleaf/**/*.bbl
+NIDAAS_overleaf/**/*.blg
+NIDAAS_overleaf/**/*.toc
+NIDAAS_overleaf/**/*.fdb_latexmk
+NIDAAS_overleaf/**/*.fls
+
+# --- Test write probes ---
+_test_write.txt
+
+# --- macOS resource forks ---
+.AppleDouble
+.LSOverride

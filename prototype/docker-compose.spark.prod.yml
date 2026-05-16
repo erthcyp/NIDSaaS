@@ -86,7 +86,7 @@ services:
   # -------------------------------------------------------------------------
   detector:
     environment:
-      DETECT_INPUT_TOPIC_SUFFIX: "preprocessed"
+      DETECT_INPUT_TOPIC_SUFFIX: "raw"
     depends_on:
       topic_init:
         condition: service_completed_successfully

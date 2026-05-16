@@ -29,12 +29,38 @@ import time
 from collections import defaultdict, deque
 from typing import Any, Deque, Dict
 
+from pathlib import Path
+
 from fastapi import FastAPI, Header, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, FileResponse
 
 log = logging.getLogger("receiver")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [receiver] %(message)s")
 
 app = FastAPI(title="NIDSaaS Tenant Webhook Receiver", version="0.2.0")
+
+# Permissive CORS so the localhost dashboard (which we serve from this
+# same receiver) can also call the gateway's /oauth/token and /ingest
+# endpoints from the browser.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Serve the live dashboard at GET /  — single-file HTML living next to
+# this app.py inside the container.
+_DASHBOARD = Path(__file__).parent / "dashboard.html"
+
+
+@app.get("/", response_class=HTMLResponse)
+async def dashboard() -> Any:
+    if _DASHBOARD.exists():
+        return FileResponse(_DASHBOARD, media_type="text/html")
+    return HTMLResponse("<h1>dashboard.html not found</h1>", status_code=404)
 
 _MAX_PER_TENANT = 200
 _MAX_TRACES = 100_000
@@ -120,6 +146,23 @@ async def traces_reset() -> dict[str, Any]:
         _traces.clear()
         _trace_order.clear()
     return {"ok": True, "reset": True}
+
+
+@app.post("/alerts/reset")
+@app.get("/alerts/reset")
+async def alerts_reset(tenant: str | None = None) -> dict[str, Any]:
+    """Clear the per-tenant alert ring buffer. Pass ?tenant=NAME to
+    only clear one tenant; omit to clear every tenant. The dashboard
+    calls this together with /traces/reset so its 'Reset alerts'
+    button wipes both data structures."""
+    async with _lock:
+        if tenant:
+            cleared = len(_buffers.get(tenant, []))
+            _buffers.pop(tenant, None)
+            return {"ok": True, "tenant": tenant, "cleared": cleared}
+        cleared = sum(len(b) for b in _buffers.values())
+        _buffers.clear()
+        return {"ok": True, "cleared": cleared}
 
 
 @app.get("/healthz")

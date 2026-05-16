@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NIDSaaS — Live Dashboard</title>
+<style>
+  :root {
+    --navy: #1f3a93;
+    --orange: #ff7f0e;
+    --green: #16a34a;
+    --red: #dc2626;
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #334155;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --border: #475569;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--panel);
+    padding: 16px 32px;
+    border-bottom: 2px solid var(--navy);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  header h1 .accent { color: var(--orange); }
+  header .tenant-pill {
+    background: var(--navy);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 32px;
+  }
+  .grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+  }
+  .card .label {
+    color: var(--text-dim);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .card .value {
+    font-size: 32px;
+    font-weight: 700;
+  }
+  .card.alerts .value { color: var(--orange); }
+  .card.delivered .value { color: var(--green); }
+  .card.tier .value { color: var(--navy); font-size: 16px; line-height: 1.4; }
+  .card.status .value { font-size: 14px; }
+  .status-ok { color: var(--green); }
+  .status-error { color: var(--red); }
+
+  .card.spark .value {
+    color: var(--text-dim);
+    font-size: 18px;
+    transition: color 0.3s;
+  }
+  .card.spark.active .value { color: var(--orange); }
+  .card.spark .sub {
+    color: var(--text-dim);
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  .spark-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    display: inline-block;
+    margin-right: 6px;
+    transition: background 0.3s;
+  }
+  .card.spark.active .spark-dot {
+    background: var(--orange);
+    animation: spark-pulse 0.6s infinite;
+  }
+  @keyframes spark-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 127, 14, 0.7); }
+    50% { box-shadow: 0 0 0 6px rgba(255, 127, 14, 0); }
+  }
+
+  .actions {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 24px;
+  }
+  .actions h2 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .actions .btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+  button:hover:not(:disabled) { background: #2a4dab; }
+  button:disabled { background: var(--panel-2); cursor: not-allowed; opacity: 0.6; }
+  button.secondary { background: var(--panel-2); }
+  button.secondary:hover:not(:disabled) { background: #475569; }
+  button.danger { background: var(--red); }
+  button.danger:hover:not(:disabled) { background: #b91c1c; }
+  button.success { background: var(--green); }
+  button.success:hover:not(:disabled) { background: #15803d; }
+  button.attack-btn {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+  button.attack-btn:hover:not(:disabled) {
+    background: var(--panel);
+    border-color: var(--orange);
+    transform: translateY(-1px);
+  }
+  .hint {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .hint code {
+    background: var(--panel-2);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--orange);
+  }
+  .attack-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .attack-tag.benign { background: rgba(22, 163, 74, 0.2); color: #4ade80; }
+  .attack-tag.dos    { background: rgba(220, 38, 38, 0.2); color: #f87171; }
+  .attack-tag.syn    { background: rgba(244, 114, 22, 0.2); color: #fb923c; }
+  .attack-tag.scan   { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+  .attack-tag.brute  { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+  .attack-tag.pcap   { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+  .attack-tag.unknown { background: var(--panel-2); color: var(--text-dim); }
+
+  .tenant-input {
+    background: var(--panel-2);
+    color: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    width: 200px;
+    margin-right: 8px;
+  }
+
+  .table-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .table-wrap h2 {
+    margin: 0;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+  }
+  .table-wrap h2 .pulse {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: var(--panel-2);
+    color: var(--text-dim);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  td.flow_id { font-family: monospace; color: var(--text-dim); }
+  td.tier { font-family: monospace; }
+  td.tier-rate { color: var(--orange); }
+  td.tier-sig { color: var(--red); }
+  td.score { text-align: right; font-family: monospace; font-weight: 600; }
+  tr:hover { background: rgba(255,255,255,0.02); }
+  .empty {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-dim);
+  }
+
+  .log {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 24px;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .log .ok { color: var(--green); }
+  .log .err { color: var(--red); }
+  .log .info { color: #38bdf8; }
+
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    padding: 24px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>NIDSaaS <span class="accent">— Live Dashboard</span></h1>
+  <div>
+    <input id="tenant-input" class="tenant-input" value="somchart" placeholder="tenant name" />
+    <span class="tenant-pill" id="tenant-pill">no token</span>
+  </div>
+</header>
+
+<main>
+  <!-- KPI cards -->
+  <div class="grid-cards">
+    <div class="card alerts">
+      <div class="label">Total Alerts Delivered</div>
+      <div class="value" id="kpi-alerts">0</div>
+    </div>
+    <div class="card delivered">
+      <div class="label">Tenant Alerts</div>
+      <div class="value" id="kpi-tenant">0</div>
+    </div>
+    <div class="card spark">
+      <div class="label">
+        <span class="spark-dot" id="spark-dot"></span>
+        Spark Preprocessor
+      </div>
+      <div class="value" id="kpi-spark">— idle</div>
+      <div class="sub" id="kpi-spark-sub">trigger 100 ms · waiting for traffic</div>
+    </div>
+    <div class="card tier">
+      <div class="label">Tier Breakdown</div>
+      <div class="value" id="kpi-tiers">—</div>
+    </div>
+    <div class="card status">
+      <div class="label">System Status</div>
+      <div class="value" id="kpi-status"><span class="status-ok">connecting…</span></div>
+    </div>
+  </div>
+
+  <!-- Action panel -->
+  <div class="actions">
+    <h2>Setup</h2>
+    <div class="btn-row">
+      <button id="btn-auth" class="success">1️⃣  Authenticate as tenant</button>
+      <button id="btn-reset" class="danger">🗑  Reset alerts</button>
+    </div>
+  </div>
+
+  <!-- Attack scenario panel -->
+  <div class="actions">
+    <h2>Simulate PCAP traffic — pick an attack scenario</h2>
+    <div class="btn-row">
+      <button class="attack-btn" id="btn-attack-benign" disabled
+              data-name="Benign HTTP" data-icon="✅" data-count="20">
+        ✅ Benign HTTP traffic
+      </button>
+      <button class="attack-btn" id="btn-attack-dos" disabled
+              data-name="Volumetric DDoS" data-icon="🌪️" data-count="30">
+        🌪️ DDoS — Volumetric
+      </button>
+      <button class="attack-btn" id="btn-attack-syn" disabled
+              data-name="SYN Flood" data-icon="🌊" data-count="25">
+        🌊 SYN Flood
+      </button>
+      <button class="attack-btn" id="btn-attack-portscan" disabled
+              data-name="Port Scan" data-icon="🔍" data-count="40">
+        🔍 Port Scan
+      </button>
+      <button class="attack-btn" id="btn-attack-bruteforce" disabled
+              data-name="SSH Brute Force" data-icon="🔓" data-count="20">
+        🔓 SSH Brute Force
+      </button>
+      <button class="attack-btn" id="btn-attack-mixed" disabled
+              data-name="Mixed (real PCAP-like)" data-icon="📦" data-count="50">
+        📦 Mixed PCAP replay
+      </button>
+    </div>
+    <div class="hint">
+      Each button simulates pushing a PCAP file containing that traffic pattern
+      to the gateway's <code>/ingest_pcap</code> endpoint. The gateway extracts
+      flow features which traverse Spark → Detector → Webhook.
+    </div>
+  </div>
+
+  <!-- Live alert table -->
+  <div class="table-wrap">
+    <h2>
+      <span><span class="pulse"></span>Recent alerts</span>
+      <span id="last-update">last update —</span>
+    </h2>
+    <div id="table-container">
+      <div class="empty">no alerts yet — click <em>Authenticate</em> then <em>Send</em></div>
+    </div>
+  </div>
+
+  <!-- Activity log -->
+  <div class="log" id="log">
+    <div class="info">[init] dashboard ready. enter tenant name and click Authenticate.</div>
+  </div>
+</main>
+
+<footer>
+  NIDSaaS prototype — gateway: <code>:8080</code> · webhook: <code>:9000</code>
+</footer>
+
+<script>
+const GATEWAY = "http://" + location.hostname + ":8080";
+const WEBHOOK = "http://" + location.hostname + ":9000";
+
+let token = null;
+let tenant = null;
+
+const $  = (id) => document.getElementById(id);
+
+// Format timestamps in Asia/Bangkok (Thai time, UTC+7), 24-hour clock.
+// fmtTime  → HH:MM:SS                    (compact, for table rows)
+// fmtFull  → DD MMM HH:MM:SS              (with date, for headers)
+// fmtRel   → "Ns ago" / "Nm ago"          (relative, for "received")
+const TZ = "Asia/Bangkok";
+const TZ_TIME = {
+  timeZone: TZ,
+  hour12: false,
+  hour: "2-digit", minute: "2-digit", second: "2-digit",
+};
+const TZ_FULL = {
+  timeZone: TZ,
+  hour12: false,
+  day: "2-digit", month: "short", year: "numeric",
+  hour: "2-digit", minute: "2-digit", second: "2-digit",
+};
+const fmtTime = (d) => d.toLocaleTimeString("en-GB", TZ_TIME);
+const fmtFull = (d) => d.toLocaleString("en-GB", TZ_FULL);
+const fmtRel  = (d) => {
+  const sec = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (sec < 0)         return "in future";
+  if (sec < 5)         return "just now";
+  if (sec < 60)        return `${sec}s ago`;
+  if (sec < 3600)      return `${Math.floor(sec / 60)}m ago`;
+  if (sec < 86400)     return `${Math.floor(sec / 3600)}h ago`;
+  return `${Math.floor(sec / 86400)}d ago`;
+};
+
+const log = (msg, cls = "") => {
+  const div = document.createElement("div");
+  div.className = cls;
+  div.textContent = `[${fmtTime(new Date())}] ${msg}`;
+  $("log").prepend(div);
+  while ($("log").children.length > 50) $("log").removeChild($("log").lastChild);
+};
+
+// ---------- Authenticate as tenant (OAuth2 client-credentials) ----------
+async function authenticate() {
+  const t = $("tenant-input").value.trim();
+  if (!t) { log("tenant name is empty", "err"); return; }
+  tenant = t;
+  const secret = `${tenant}-secret`;
+
+  const body = new URLSearchParams({
+    grant_type: "client_credentials",
+    client_id: tenant,
+    client_secret: secret,
+  });
+
+  try {
+    log(`POST ${GATEWAY}/oauth/token  client_id=${tenant}`, "info");
+    const r = await fetch(`${GATEWAY}/oauth/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
+    });
+    const j = await r.json();
+    if (!r.ok) {
+      log(`auth failed: HTTP ${r.status} ${j.detail || ""}`, "err");
+      $("tenant-pill").textContent = `auth failed`;
+      return;
+    }
+    token = j.access_token;
+    $("tenant-pill").textContent = `${tenant} ✓`;
+    document.querySelectorAll(".attack-btn").forEach(b => b.disabled = false);
+    log(`authenticated as ${tenant} (token: ${token.slice(0, 24)}…)`, "ok");
+  } catch (e) {
+    log(`auth error: ${e.message}`, "err");
+  }
+}
+
+// ---------- Attack scenario library ------------------------------
+// Each scenario produces one flow record at index `idx`. Feature
+// distributions intentionally reproduce the rate-rule trigger
+// signatures from prototype/pipeline/signature_rate_rules.py so the
+// detector lights up the corresponding tier:
+//
+//   benign     → no rate rule fires  → tier2 gate (low score)
+//   dos        → V (volumetric)      → tier1_rate
+//   syn        → S (SYN-flood)       → tier1_rate
+//   portscan   → P (port scan)       → tier1_rate
+//   bruteforce → B (brute force)     → tier1_rate
+//   mixed      → random of the above
+const SCENARIOS = {
+  benign: {
+    label: "Benign HTTP", tag: "benign",
+    src: "192.168.10.50",  dst: "10.0.0.42",   dport: 443,
+    flow: (i) => ({
+      flow_duration: 800000 + i * 30000,
+      total_packets: 18 + (i % 4),
+      flow_packets_s: 12 + (i % 5),
+      flow_bytes_s: 4500 + (i * 80),
+      destination_port: 443,
+      syn_flag_count: 1,
+      rst_flag_count: 0,
+      ack_flag_count: 12 + (i % 3),
+    }),
+  },
+  dos: {
+    label: "Volumetric DDoS", tag: "dos",
+    src: "203.0.113.99",   dst: "10.0.0.10",   dport: 80,
+    flow: (i) => ({
+      flow_duration: 50000,
+      total_packets: 200 + i,
+      flow_packets_s: 80000 + (i * 200),         // V rule: > 40,000
+      flow_bytes_s: 30000000 + (i * 100000),     // V rule: > 1.5e7
+      destination_port: 80,
+      syn_flag_count: 1,
+      rst_flag_count: 0,
+      ack_flag_count: 50,
+    }),
+  },
+  syn: {
+    label: "SYN Flood", tag: "syn",
+    src: "198.51.100.7",   dst: "10.0.0.10",   dport: 443,
+    flow: (i) => ({
+      flow_duration: 1000,
+      total_packets: 5 + (i % 3),                // S rule: <= 10
+      flow_packets_s: 5000 + i,
+      flow_bytes_s: 600,
+      destination_port: 443,
+      syn_flag_count: 5 + (i % 3),               // S rule: >= 3
+      rst_flag_count: 0,
+      ack_flag_count: 0,
+    }),
+  },
+  portscan: {
+    label: "Port Scan", tag: "scan",
+    src: "172.16.7.42",    dst: "10.0.0.10",   dport: null,
+    flow: (i) => ({
+      flow_duration: 5,                          // P rule: <= 10ms
+      total_packets: 2,                          // P rule: <= 10
+      flow_packets_s: 200,
+      flow_bytes_s: 100,
+      destination_port: 1000 + i,                // sweep ports 1000+
+      syn_flag_count: 1,
+      rst_flag_count: 0,
+    }),
+  },
+  bruteforce: {
+    label: "SSH Brute Force", tag: "brute",
+    src: "203.0.113.55",   dst: "10.0.0.10",   dport: 22,
+    flow: (i) => ({
+      flow_duration: 200000,
+      total_packets: 12,
+      flow_packets_s: 60,
+      flow_bytes_s: 1200,
+      destination_port: 22,                      // B rule: in {21,22,23}
+      syn_flag_count: 1,
+      rst_flag_count: 0,
+    }),
+  },
+  mixed: { /* dispatched per-flow below */ },
+};
+
+// ---------- Send a scenario as a "PCAP" replay ------------------
+async function sendScenario(name, count) {
+  if (!token) { log("authenticate first", "err"); return; }
+  const start = Date.now();
+  const scenarios = name === "mixed"
+    ? ["benign", "dos", "syn", "portscan", "bruteforce"]
+    : [name];
+
+  log(`▶ replaying PCAP scenario '${name}' (${count} flows) …`, "info");
+
+  let ok = 0, fail = 0;
+  for (let i = 0; i < count; i++) {
+    const sName = scenarios[i % scenarios.length];
+    const s = SCENARIOS[sName];
+    const flowId = `pcap-${sName}-${Date.now()}-${i}`;
+    const body = {
+      flow_id: flowId,
+      label: sName,                             // tagged so dashboard can colour
+      features: s.flow(i),
+    };
+    try {
+      const r = await fetch(`${GATEWAY}/ingest`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "X-Trace-Id": flowId,
+        },
+        body: JSON.stringify(body),
+      });
+      if (r.ok || r.status === 202) ok++; else fail++;
+    } catch (e) {
+      fail++;
+    }
+    // Record scenario metadata locally so the table can show
+    // attack type even before the alert echoes back.
+    pendingByTrace[flowId] = {
+      scenario: sName,
+      label: s.label,
+      src: s.src,
+      dst: s.dst,
+      dport: s.dport ?? body.features.destination_port,
+    };
+  }
+  const dt = Date.now() - start;
+  log(`✓ scenario '${name}' replay done — ${ok}/${count} accepted in ${dt}ms`,
+      fail ? "err" : "ok");
+}
+
+// trace_id -> {scenario, label, src, dst, dport}
+const pendingByTrace = {};
+
+// ---------- Reset webhook trace store + alert buffer ----------
+async function resetTraces() {
+  try {
+    // /traces/reset clears the trace_id ring buffer used by the load
+    // harness; /alerts/reset clears the per-tenant alert buffer that
+    // this dashboard polls. Hit both so the table actually empties.
+    const url = tenant
+      ? `${WEBHOOK}/alerts/reset?tenant=${encodeURIComponent(tenant)}`
+      : `${WEBHOOK}/alerts/reset`;
+    const [r1, r2] = await Promise.all([
+      fetch(`${WEBHOOK}/traces/reset`, { method: "POST" }),
+      fetch(url, { method: "POST" }),
+    ]);
+    const j2 = await r2.json();
+    log(`reset: traces cleared, ${j2.cleared || 0} alerts cleared`, "info");
+    // Reset the local Spark-rate samples too so the indicator goes idle.
+    sparkSamples.length = 0;
+    await refresh();
+  } catch (e) {
+    log(`reset failed: ${e.message}`, "err");
+  }
+}
+
+// Rolling window of (timestamp, total_alerts) samples — used to derive
+// Spark preprocessor activity (alerts/sec) from the alert delivery
+// rate. While direct Spark-side metrics (Kafka offsets, JVM stats)
+// would be more authoritative, the alert delivery rate is downstream
+// of Spark + Detector + Fan-out: a non-zero rate proves all three
+// stages are processing in real time.
+const sparkSamples = [];     // {ts: ms, total: int}
+const SPARK_WINDOW_MS = 5000;
+
+function updateSparkIndicator(total) {
+  const now = Date.now();
+  sparkSamples.push({ ts: now, total });
+  // Drop samples older than the window
+  while (sparkSamples.length && now - sparkSamples[0].ts > SPARK_WINDOW_MS) {
+    sparkSamples.shift();
+  }
+  if (sparkSamples.length < 2) {
+    $("kpi-spark").textContent = "— idle";
+    $("kpi-spark-sub").textContent = "trigger 100 ms · waiting for traffic";
+    document.querySelector(".card.spark").classList.remove("active");
+    return;
+  }
+  const oldest = sparkSamples[0];
+  const dt = (now - oldest.ts) / 1000;       // seconds
+  const dN = total - oldest.total;
+  const rate = dt > 0 ? dN / dt : 0;
+
+  const card = document.querySelector(".card.spark");
+  if (rate > 0.5) {
+    card.classList.add("active");
+    $("kpi-spark").textContent = `✓ active · ${rate.toFixed(1)} alerts/s`;
+    $("kpi-spark-sub").textContent =
+      `processing ${dN} alerts in last ${dt.toFixed(1)}s window · trigger 100 ms`;
+  } else {
+    card.classList.remove("active");
+    $("kpi-spark").textContent = "— idle";
+    $("kpi-spark-sub").textContent =
+      `no alerts in last ${SPARK_WINDOW_MS/1000}s · click Send to start traffic`;
+  }
+}
+
+// ---------- Poll /alerts/<tenant> and refresh KPI + table ----------
+//
+// We use /alerts/<tenant> (the in-memory ring buffer keyed by tenant)
+// rather than /traces (the trace-id keyed dict) because:
+//   * /traces gets wiped by /traces/reset and stays empty if upstream
+//     producers (Spark, alert_fanout) don't propagate X-Trace-Id;
+//   * /alerts is populated unconditionally from POST /<tenant> body —
+//     it accumulates regardless of trace propagation.
+async function refresh() {
+  if (!tenant) {
+    // Before authentication we still poll the global /traces just to
+    // surface "stack health" via the webhook responding 200.
+    try {
+      const r = await fetch(`${WEBHOOK}/traces`);
+      const j = await r.json();
+      $("kpi-status").innerHTML = `<span class="status-ok">✓ webhook OK</span>`;
+      $("kpi-alerts").textContent = j.count || 0;
+      updateSparkIndicator(j.count || 0);
+    } catch (e) {
+      $("kpi-status").innerHTML = `<span class="status-error">✗ webhook offline</span>`;
+    }
+    return;
+  }
+
+  try {
+    // Per-tenant alert ring buffer. limit=100 keeps the response small;
+    // the webhook keeps up to 200 most-recent alerts per tenant.
+    const r = await fetch(`${WEBHOOK}/alerts/${encodeURIComponent(tenant)}?limit=100`);
+    const j = await r.json();
+    const items = j.items || [];
+    const total = j.count || 0;
+
+    // Update Spark indicator from rate of change of THIS tenant's alerts
+    updateSparkIndicator(total);
+
+    // Synthesize the structures the rest of the function expects
+    // (it was originally written for the /traces shape).
+    const traces = {};
+    items.forEach(it => {
+      const fid = it.flow_id || `__${Math.random()}`;
+      traces[fid] = [it];
+    });
+
+    // Filter for current tenant
+    const tenantEvents = [];
+    for (const [tid, events] of Object.entries(traces)) {
+      if (events && events[0] && events[0].tenant === tenant) {
+        tenantEvents.push(events[0]);
+      }
+    }
+
+    $("kpi-alerts").textContent = total;
+    $("kpi-tenant").textContent = tenantEvents.length;
+    $("kpi-status").innerHTML = `<span class="status-ok">✓ connected</span>`;
+    $("last-update").textContent = "last update " + fmtFull(new Date()) + " (Asia/Bangkok)";
+
+    // Tier breakdown
+    const tiers = {};
+    for (const ev of tenantEvents) {
+      tiers[ev.tier || "unknown"] = (tiers[ev.tier || "unknown"] || 0) + 1;
+    }
+    $("kpi-tiers").innerHTML = Object.entries(tiers)
+      .map(([k, v]) => `${k}: <strong>${v}</strong>`)
+      .join("<br>") || "—";
+
+    // Find scenario metadata from pendingByTrace (recorded when the
+    // dashboard buttons sent flows). For PCAP-derived alerts the
+    // flow_id looks like 192.168.10.25-192.168.10.255-138-138-17 —
+    // parse the 5-tuple out of it so we can render src → dst.
+    const eventsWithCtx = tenantEvents.map(ev => {
+      let ctx = pendingByTrace[ev.flow_id];
+      if (!ctx) {
+        // CICFlowMeter Flow ID = src-dst-sport-dport-proto
+        const m = (ev.flow_id || "").match(
+          /^(\d{1,3}(?:\.\d{1,3}){3})-(\d{1,3}(?:\.\d{1,3}){3})-(\d+)-(\d+)-(\d+)$/);
+        if (m) {
+          const proto = ({ "6": "TCP", "17": "UDP", "1": "ICMP" })[m[5]] || `proto${m[5]}`;
+          ctx = {
+            scenario: "pcap",
+            label: `PCAP (${proto})`,
+            src: m[1],
+            dst: m[2],
+            dport: m[4],
+          };
+        } else {
+          ctx = {};
+        }
+      }
+      return { ...ev, _ctx: ctx };
+    });
+
+    // Table — most recent first, max 30 rows
+    const recent = eventsWithCtx.slice().reverse().slice(0, 30);
+    if (recent.length === 0) {
+      $("table-container").innerHTML =
+        `<div class="empty">no alerts yet for tenant <strong>${tenant || "—"}</strong> — pick a scenario above</div>`;
+    } else {
+      const rows = recent.map(ev => {
+        const tierClass = ev.tier?.includes("sig") ? "tier-sig"
+                       : ev.tier?.includes("rate") ? "tier-rate" : "";
+        // For PCAP-derived alerts the FLOW happened on the original
+        // capture date (e.g. CIC-IDS2017 Friday-WorkingHours.pcap was
+        // captured 2017-07-07). For live / synthetic flows there is no
+        // capture timestamp — fall through to verdict_ts (when our
+        // detector decided) or ingest_ts (when gateway received).
+        let tsCell = "—";
+        let captureTs = null;
+        if (ev.flow_capture_ts) {
+          // CICFlowMeter writes "DD/MM/YYYY HH:MM:SS" or "DD-MM-YYYY HH:MM:SS".
+          // Try both — Date.parse is permissive but expects yyyy first,
+          // so we normalise.
+          const m = String(ev.flow_capture_ts).match(
+            /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+          if (m) {
+            const iso = `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}T` +
+                        `${m[4].padStart(2,'0')}:${m[5]}:${m[6] || '00'}+07:00`;
+            const d = new Date(iso);
+            if (!isNaN(d.getTime())) captureTs = d;
+          }
+        }
+
+        if (captureTs) {
+          tsCell = `<div>${fmtFull(captureTs)}</div>` +
+                   `<div style="color:#38bdf8;font-size:11px">📦 PCAP capture time</div>`;
+        } else {
+          const ts = ev.receive_ts || ev.verdict_ts || ev.ingest_ts;
+          if (ts) {
+            const d = new Date(ts * 1000);
+            tsCell = `<div>${fmtFull(d)}</div>` +
+                     `<div style="color:var(--text-dim);font-size:11px">${fmtRel(d)} (processed)</div>`;
+          }
+        }
+        const ctx = ev._ctx || {};
+        const tagClass = ctx.scenario || "unknown";
+        const tagLabel = ctx.label || "unknown";
+        const src = ctx.src || "—";
+        const dst = ctx.dst ? `${ctx.dst}:${ctx.dport ?? "?"}` : "—";
+
+        return `<tr>
+          <td>${tsCell}</td>
+          <td><span class="attack-tag ${tagClass}">${tagLabel}</span></td>
+          <td class="flow_id">${src} → ${dst}</td>
+          <td class="tier ${tierClass}">${ev.tier || "—"}</td>
+          <td>${ev.decision === 1 ? "🚨 attack" : "✓ benign"}</td>
+          <td class="score">${(ev.score ?? 0).toFixed(3)}</td>
+        </tr>`;
+      }).join("");
+      $("table-container").innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>received</th>
+              <th>traffic source</th>
+              <th>flow (src → dst)</th>
+              <th>detection tier</th>
+              <th>verdict</th>
+              <th>score</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+  } catch (e) {
+    $("kpi-status").innerHTML = `<span class="status-error">✗ webhook offline</span>`;
+  }
+}
+
+// ---------- Wire up buttons ----------
+$("btn-auth").addEventListener("click", authenticate);
+$("btn-reset").addEventListener("click", resetTraces);
+
+// Attack-scenario buttons — hooked up generically by data-* attrs
+document.querySelectorAll(".attack-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    // id form: btn-attack-<scenario>
+    const name = btn.id.replace(/^btn-attack-/, "");
+    const count = parseInt(btn.dataset.count || "20", 10);
+    sendScenario(name, count);
+  });
+});
+
+// Auto-refresh every 1 s
+refresh();
+setInterval(refresh, 1000);
+</script>
+</body>
+</html>

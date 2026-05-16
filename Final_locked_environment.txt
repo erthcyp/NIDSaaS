@@ -1,0 +1,21 @@
+Final locked environment
+
+Dataset: CIC-IDS2017
+Split: temporal_by_file
+Ratio: 64/16/20
+Seed: 42
+Shared preprocessing: same
+Test set: shared held-out test
+Validation role: calibrate the decision threshold for every method; the validation set is the only data used for operating-point selection.
+Main operating point: tau* = argmax accuracy on D_val (tie-safe achievable-cut search), applied unchanged to D_test.
+Main reported row: test performance under validation-calibrated Accuracy.
+Test-set policy: D_test is used exactly once per method, to compute the reported metrics. It is never used for training, hyperparameter selection, or threshold tuning.
+
+Supporting metrics:
+Accuracy
+Precision
+Recall
+F1
+FAR
+ROC-AUC
+PR-AUC

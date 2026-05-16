@@ -113,6 +113,24 @@ sig_cache = SignatureCache()
 # ---------------------------------------------------------------------------
 # Verdict -> Kafka payload
 # ---------------------------------------------------------------------------
+def _flow_capture_ts(raw: dict[str, Any]) -> Any:
+    """Pull the original packet-capture timestamp out of the flow record
+    if available. CICFlowMeter populates a 'Timestamp' column (string
+    'DD/MM/YYYY HH:MM:SS' or 'DD-MM-YYYY HH:MM:SS') for each flow it
+    extracts; we surface it so the dashboard can show 'when did the
+    attack actually occur', not just 'when did our system process it'.
+    Returns None for synthetic flows that have no PCAP origin."""
+    feats = raw.get("features") or {}
+    if not isinstance(feats, dict):
+        return None
+    # Try a couple of casings — CICFlowMeter v3 vs v4 differ.
+    for k in ("Timestamp", "timestamp", "Flow Timestamp", "flow_timestamp"):
+        v = feats.get(k)
+        if v not in (None, ""):
+            return v
+    return None
+
+
 def _verdict_payload(tenant: str, raw: dict[str, Any], verdict: Verdict) -> dict[str, Any]:
     return {
         "tenant": tenant,
@@ -130,6 +148,10 @@ def _verdict_payload(tenant: str, raw: dict[str, Any], verdict: Verdict) -> dict
         "reason": verdict.reason,
         "verdict_ts": time.time(),
         "ingest_ts": raw.get("ingest_ts"),
+        # Original packet-capture time from CICFlowMeter (if PCAP source).
+        # Format depends on CICFlowMeter version — kept as raw string so
+        # the dashboard / SIEM can parse however it likes.
+        "flow_capture_ts": _flow_capture_ts(raw),
         # Trace propagation for the load harness (no-op when absent).
         "trace_id": raw.get("trace_id"),
         "chunk_id": raw.get("chunk_id"),

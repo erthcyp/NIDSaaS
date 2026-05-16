@@ -12,6 +12,11 @@ The escalation gate therefore sees:
     raw flow features, rf_score, rf_pvalue, rate_L, rate_P
 
 Only rows with rf_pvalue <= alpha_escalate are passed to the gate.
+
+Hybrid-Cascade-v2 (optional, controlled by --clad-predictions-val and
+--clad-predictions-test): the gate additionally receives clad_score, the
+[0,1] anomaly score emitted by the CLAD baseline. When the CLAD CSVs are
+not provided the cascade behaves exactly like v1.
 """
 
 from __future__ import annotations
@@ -46,6 +51,15 @@ def _resolve_first(df: pd.DataFrame, candidates: list[str]) -> Optional[str]:
 
 TIER2_META_COLUMNS = ("rate_V", "rate_L", "rate_S", "rate_R", "rate_P", "rate_B")
 
+# v2 (Hybrid-Cascade-v2): optional extra meta features the escalation gate can
+# consume alongside the existing rf_score / rf_pvalue / rate_rules signals.
+# Currently only `clad_score` is supported -- the [0,1] anomaly score emitted
+# by the CLAD baseline (closr_baseline_valcal.py) for each row_id. The CLAD
+# score is merged in only when both --clad-predictions-val and
+# --clad-predictions-test are provided; otherwise the cascade behaves
+# exactly like v1.
+EXTRA_META_COLUMNS_V2 = ("clad_score",)
+
 
 def load_signature_table(path: str) -> pd.DataFrame:
     """Load the merged signature predictions CSV. Always returns the fast-path
@@ -71,10 +85,6 @@ def load_signature_table(path: str) -> pd.DataFrame:
     else:
         out["snort_score"] = out["snort_pred"].astype(float)
 
-    # Optional tier-2 meta columns. When the CSV was produced by the old
-    # pre-tier schema these will simply be missing; downstream merges fill
-    # with zeros so the gate has the same feature count but receives a
-    # constant signal.
     for c in TIER2_META_COLUMNS:
         if c in df.columns:
             out[c] = pd.to_numeric(df[c], errors="coerce").fillna(0).astype(int)
@@ -90,8 +100,52 @@ def load_signature_table(path: str) -> pd.DataFrame:
     return out
 
 
-# Back-compat alias so anything importing the old name keeps working.
 load_snort_table = load_signature_table
+
+
+def load_clad_table(path: str) -> pd.DataFrame:
+    """Load CLAD baseline predictions and reduce to (row_id, clad_score).
+
+    Expects a CSV produced by ``closr_baseline_valcal.py`` containing the
+    columns ``row_id`` and ``gate_prob`` (the [0,1]-mapped CLAD anomaly
+    score). The ``gate_prob`` column is renamed to ``clad_score`` so the
+    cascade's gate sees a uniquely named meta feature.
+    """
+    df = pd.read_csv(path)
+    row_id_col = _resolve_first(df, ["row_id"])
+    score_col = _resolve_first(df, ["clad_score", "gate_prob", "cascade_score"])
+    if row_id_col is None:
+        raise ValueError(f"CLAD predictions CSV {path} must contain row_id.")
+    if score_col is None:
+        raise ValueError(
+            f"CLAD predictions CSV {path} must contain one of "
+            f"['clad_score', 'gate_prob', 'cascade_score']."
+        )
+    out = pd.DataFrame()
+    out["row_id"] = pd.to_numeric(df[row_id_col], errors="coerce")
+    out["clad_score"] = pd.to_numeric(df[score_col], errors="coerce").fillna(0.0).astype(float)
+    out = out.dropna(subset=["row_id"]).copy()
+    out["row_id"] = out["row_id"].astype(np.int64)
+    log(
+        f"CLAD table loaded from {path} | rows={len(out):,} | "
+        f"clad_score range=[{out['clad_score'].min():.4f}, {out['clad_score'].max():.4f}]"
+    )
+    return out
+
+
+def merge_clad(base_df: pd.DataFrame, clad_table: pd.DataFrame, tag: str) -> tuple[pd.DataFrame, dict]:
+    """Left-merge CLAD score column onto base_df by row_id. Missing rows get
+    clad_score=0.5 (neutral prior) so an unmatched flow does not bias the
+    gate. Returns (merged_df, coverage_info)."""
+    if "row_id" not in base_df.columns:
+        raise ValueError("Base dataframe must contain row_id for CLAD merge.")
+    merged = base_df.merge(clad_table, on="row_id", how="left", indicator=True)
+    matched = int((merged["_merge"] == "both").sum())
+    coverage = float(matched / max(1, len(merged)))
+    merged["clad_score"] = merged["clad_score"].fillna(0.5).astype(float)
+    merged = merged.drop(columns=["_merge"])
+    log(f"CLAD coverage [{tag}] | matched={matched:,}/{len(merged):,} ({coverage:.1%})")
+    return merged, {"matched_rows": matched, "coverage_frac": coverage}
 
 
 def merge_signature(base_df: pd.DataFrame, signature_table: pd.DataFrame, tag: str) -> tuple[pd.DataFrame, dict]:
@@ -113,7 +167,6 @@ def merge_signature(base_df: pd.DataFrame, signature_table: pd.DataFrame, tag: s
     return merged, {"matched_rows": matched, "coverage_frac": coverage}
 
 
-# Back-compat alias
 merge_snort = merge_signature
 
 
@@ -169,6 +222,7 @@ def cascade_predict(
     score = np.where(escalated, np.maximum(score, gate_prob), score)
     score = np.where(snort_pred == 1, np.maximum(score, 1.0), score)
     return final, score
+
 
 def _to_numpy_1d(x, name: str) -> np.ndarray:
     arr = np.asarray(x)
@@ -237,10 +291,8 @@ def export_cascade_split_predictions(
     test_cascade_pred,
     test_cascade_score,
 ):
-    """
-    Export validation and test prediction tables for downstream
-    validation-calibrated thresholding of the proposed method.
-    """
+    """Export validation and test prediction tables for downstream
+    validation-calibrated thresholding of the proposed method."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -256,7 +308,6 @@ def export_cascade_split_predictions(
         cascade_pred=val_cascade_pred,
         cascade_score=val_cascade_score,
     )
-
     test_out = _build_prediction_export(
         base_df=test_df,
         split_name="test",
@@ -272,13 +323,12 @@ def export_cascade_split_predictions(
 
     val_path = out_dir / "val_cascade_predictions.csv"
     test_path = out_dir / "test_cascade_predictions.csv"
-
     val_out.to_csv(val_path, index=False)
     test_out.to_csv(test_path, index=False)
-
     print(f"[cascade-export] wrote: {val_path}", flush=True)
     print(f"[cascade-export] wrote: {test_path}", flush=True)
     return val_path, test_path
+
 
 def run_cascade(
     data_dir: str,
@@ -293,6 +343,11 @@ def run_cascade(
     gate_max_iter: int = 300,
     calibration_fraction: float = 0.50,
     paper_model_name: str = "Hybrid-Cascade-SplitCal-FastSnort",
+    clad_predictions_val: Optional[str] = None,
+    clad_predictions_test: Optional[str] = None,
+    skip_rate_rules_meta: bool = False,
+    skip_conformal: bool = False,
+    skip_gate: bool = False,
 ) -> pd.DataFrame:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -328,13 +383,28 @@ def run_cascade(
     log("scoring test set ...")
     test_scores = rf_model.score_samples(splits.test_all)
 
-    conformal = ConformalAnomalyWrapper(
-        ConformalConfig(alpha=alpha_conformal, seed=seed)
-    ).fit(cal_scores)
-    conformal.save(out / "conformal_wrapper.joblib")
+    if skip_conformal:
+        log("ABLATION --no-conformal: bypassing conformal calibration; using min-max-normalized RF score")
+        conformal = None
+        # Use raw RF score (min-max normalized to [0,1]) as the "p-value" surrogate
+        # so that the escalation gate sees the same shape interface but
+        # without finite-sample calibration guarantees.
+        all_scores = np.concatenate([cal_scores, gate_val_scores, test_scores])
+        s_min, s_max = float(all_scores.min()), float(all_scores.max())
+        s_range = max(1e-12, s_max - s_min)
+        # Lower p-value = more anomalous; lower raw score = more anomalous in this RF
+        # so map: p = (score - s_min) / s_range  (NOT 1 - that, since we want
+        # small p for low-score anomalies)
+        gate_val_pvals = (gate_val_scores - s_min) / s_range
+        test_pvals = (test_scores - s_min) / s_range
+    else:
+        conformal = ConformalAnomalyWrapper(
+            ConformalConfig(alpha=alpha_conformal, seed=seed)
+        ).fit(cal_scores)
+        conformal.save(out / "conformal_wrapper.joblib")
 
-    gate_val_pvals = conformal.pvalue(gate_val_scores)
-    test_pvals = conformal.pvalue(test_scores)
+        gate_val_pvals = conformal.pvalue(gate_val_scores)
+        test_pvals = conformal.pvalue(test_scores)
 
     signature_table = load_signature_table(snort_predictions_path)
     gate_val_merged, gate_val_sig_cov = merge_signature(gate_val_df, signature_table, tag="gate_val")
@@ -342,12 +412,28 @@ def run_cascade(
     test_snort_pred = test_merged["snort_pred"].to_numpy()
     test_snort_score = test_merged["snort_score"].to_numpy()
 
-    # Tier-2 rate-rule columns that were carried through the merge, used as
-    # extra meta-features for the escalation gate when present.
-    gate_meta_cols_extra = [c for c in TIER2_META_COLUMNS if c in gate_val_merged.columns]
-    test_meta_cols_extra = [c for c in TIER2_META_COLUMNS if c in test_merged.columns]
-    log(f"gate-val tier-2 meta columns: {gate_meta_cols_extra}")
-    log(f"test     tier-2 meta columns: {test_meta_cols_extra}")
+    # --- Hybrid-Cascade-v2: optional CLAD meta feature ---------------------
+    gate_val_clad_cov = test_clad_cov = None
+    if clad_predictions_val is not None and clad_predictions_test is not None:
+        clad_val_table = load_clad_table(clad_predictions_val)
+        clad_test_table = load_clad_table(clad_predictions_test)
+        gate_val_merged, gate_val_clad_cov = merge_clad(gate_val_merged, clad_val_table, tag="gate_val")
+        test_merged, test_clad_cov = merge_clad(test_merged, clad_test_table, tag="test")
+        log("Hybrid-Cascade-v2 mode: CLAD signal will be forwarded to the gate")
+    elif clad_predictions_val is not None or clad_predictions_test is not None:
+        raise ValueError(
+            "Provide BOTH --clad-predictions-val and --clad-predictions-test "
+            "to enable Hybrid-Cascade-v2, or neither to run the v1 baseline."
+        )
+
+    extra_meta_pool = list(TIER2_META_COLUMNS) + list(EXTRA_META_COLUMNS_V2)
+    if skip_rate_rules_meta:
+        log("ABLATION --no-rate-rules-meta: dropping rate_* columns from gate meta")
+        extra_meta_pool = [c for c in extra_meta_pool if c not in TIER2_META_COLUMNS]
+    gate_meta_cols_extra = [c for c in extra_meta_pool if c in gate_val_merged.columns]
+    test_meta_cols_extra = [c for c in extra_meta_pool if c in test_merged.columns]
+    log(f"gate-val extra meta columns: {gate_meta_cols_extra}")
+    log(f"test     extra meta columns: {test_meta_cols_extra}")
 
     gate_val_meta_dict = {
         "rf_score": gate_val_scores,
@@ -371,20 +457,33 @@ def run_cascade(
             "increase alpha_escalate or lower calibration_fraction."
         )
 
-    gate = EscalationGateFastSnort(
-        EscalationGateFastSnortConfig(
+    if skip_gate:
+        log("ABLATION --no-gate: bypassing escalation gate; final = signature OR (p_value <= alpha_conformal)")
+        # Build a stub object exposing predict_proba that just returns rf p-value-derived score
+        class _PassthroughGate:
+            def predict_proba(self, df, meta):
+                # treat (1 - p_value) as anomaly probability
+                p = meta["rf_pvalue"].to_numpy()
+                return (1.0 - p).astype(float)
+            def save(self, path):
+                Path(path).write_text("# stub passthrough gate (skip_gate=True)\n")
+        gate = _PassthroughGate()
+        gate.save(out / "escalation_gate_fastsnort.joblib")
+    else:
+        gate = EscalationGateFastSnort(
+            EscalationGateFastSnortConfig(
             max_iter=gate_max_iter,
             threshold=gate_threshold,
             random_state=seed,
+            )
+        ).fit(
+            df=gate_val_df.loc[escalation_mask_val].reset_index(drop=True),
+            meta=gate_val_meta.loc[escalation_mask_val].reset_index(drop=True),
+            y=gate_val_df.loc[escalation_mask_val, "binary_label"].to_numpy(),
+            feature_columns=rf_model.feature_columns,
+            preprocessor=rf_model.preprocessor,
         )
-    ).fit(
-        df=gate_val_df.loc[escalation_mask_val].reset_index(drop=True),
-        meta=gate_val_meta.loc[escalation_mask_val].reset_index(drop=True),
-        y=gate_val_df.loc[escalation_mask_val, "binary_label"].to_numpy(),
-        feature_columns=rf_model.feature_columns,
-        preprocessor=rf_model.preprocessor,
-    )
-    gate.save(out / "escalation_gate_fastsnort.joblib")
+        gate.save(out / "escalation_gate_fastsnort.joblib")
 
     test_meta_dict = {
         "rf_score": test_scores,
@@ -411,9 +510,7 @@ def run_cascade(
         alpha_escalate=alpha_escalate,
         gate_threshold=gate_threshold,
     )
-    # ------------------------------------------------------------
-    # Export split-specific prediction tables for proposed val-cal
-    # ------------------------------------------------------------
+
     val_snort_pred = gate_val_merged["snort_pred"].to_numpy()
     val_snort_score = gate_val_merged["snort_score"].to_numpy()
 
@@ -456,6 +553,7 @@ def run_cascade(
         test_cascade_pred=final_pred,
         test_cascade_score=cascade_score,
     )
+
     y_test = splits.test_all["binary_label"].to_numpy()
     rf_pred = (test_scores > rf_model.threshold).astype(int)
     conformal_pred = (test_pvals <= alpha_conformal).astype(int)
@@ -549,8 +647,14 @@ def run_cascade(
             "test_escalation_pool_size": int(n_test_esc),
             "snort_test_coverage": test_snort_cov,
             "signature_gate_val_coverage": gate_val_sig_cov,
+            "clad_predictions_val": str(clad_predictions_val) if clad_predictions_val else None,
+            "clad_predictions_test": str(clad_predictions_test) if clad_predictions_test else None,
+            "clad_gate_val_coverage": gate_val_clad_cov,
+            "clad_test_coverage": test_clad_cov,
+            "cascade_variant": "v2" if "clad_score" in gate_meta_cols_extra else "v1",
             "gate_meta_columns": ["rf_score", "rf_pvalue", *gate_meta_cols_extra],
-            "tier2_meta_columns_present": gate_meta_cols_extra,
+            "tier2_meta_columns_present": [c for c in gate_meta_cols_extra if c in TIER2_META_COLUMNS],
+            "v2_meta_columns_present": [c for c in gate_meta_cols_extra if c in EXTRA_META_COLUMNS_V2],
         },
         out / "cascade_summary.json",
     )
@@ -573,7 +677,6 @@ if __name__ == "__main__":
     parser.add_argument("--gate-threshold", type=float, default=0.5)
     parser.add_argument(
         "--split-strategy",
-        # Locked environment: temporal_by_file (day-level) split.
         default="temporal_by_file",
         choices=["random", "temporal", "temporal_by_file"],
     )
@@ -581,6 +684,35 @@ if __name__ == "__main__":
     parser.add_argument("--gate-max-iter", type=int, default=300)
     parser.add_argument("--calibration-fraction", type=float, default=0.50)
     parser.add_argument("--paper-model-name", default="Hybrid-Cascade-SplitCal-FastSnort")
+    parser.add_argument(
+        "--clad-predictions-val",
+        default=None,
+        help="(Hybrid-Cascade-v2) Path to val_closr_predictions.csv produced by "
+        "closr_baseline_valcal.py. When set together with --clad-predictions-test, "
+        "the gate receives clad_score as an extra meta feature.",
+    )
+    parser.add_argument(
+        "--clad-predictions-test",
+        default=None,
+        help="(Hybrid-Cascade-v2) Path to test_closr_predictions.csv produced by "
+        "closr_baseline_valcal.py. Must be provided together with --clad-predictions-val.",
+    )
+    # === Ablation flags (used by the design-space analysis in the paper) ===
+    parser.add_argument(
+        "--no-rate-rules-meta", dest="skip_rate_rules_meta",
+        action="store_true",
+        help="ABLATION: drop the rate_* indicator columns from the gate meta features.",
+    )
+    parser.add_argument(
+        "--no-conformal", dest="skip_conformal",
+        action="store_true",
+        help="ABLATION: bypass split-conformal calibration; use min-max-normalized RF score.",
+    )
+    parser.add_argument(
+        "--no-gate", dest="skip_gate",
+        action="store_true",
+        help="ABLATION: bypass the HistGB escalation gate; use (1 - p_value) as gate probability.",
+    )
     args = parser.parse_args()
 
     run_cascade(
@@ -596,4 +728,9 @@ if __name__ == "__main__":
         gate_max_iter=args.gate_max_iter,
         calibration_fraction=args.calibration_fraction,
         paper_model_name=args.paper_model_name,
+        clad_predictions_val=args.clad_predictions_val,
+        clad_predictions_test=args.clad_predictions_test,
+        skip_rate_rules_meta=args.skip_rate_rules_meta,
+        skip_conformal=args.skip_conformal,
+        skip_gate=args.skip_gate,
     )

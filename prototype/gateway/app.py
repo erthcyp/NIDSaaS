@@ -49,6 +49,7 @@ import httpx
 import jwt
 from aiokafka import AIOKafkaProducer
 from fastapi import Depends, FastAPI, Form, Header, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, Field
 
@@ -124,6 +125,18 @@ dedup = DedupWindow(DEDUP_WINDOW_SEC)
 # FastAPI app + global producer / http client
 # ---------------------------------------------------------------------------
 app = FastAPI(title="NIDSaaS Gateway", version="0.2.0")
+
+# Permissive CORS so the localhost dashboard (served from the webhook
+# receiver on :9000) can call /oauth/token and /ingest on this gateway
+# (:8080) directly from the browser.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 oauth2 = OAuth2PasswordBearer(tokenUrl="/oauth/token", auto_error=True)
 
 _producer: AIOKafkaProducer | None = None

@@ -77,6 +77,152 @@ def read_cic_ids2017_folder(data_dir):
     return merged
 
 
+def read_lycos_csv(csv_path) -> pd.DataFrame:
+    """Read the single-file Lycos2017 corpus and return a DataFrame in the
+    same shape downstream cascade scripts expect.
+
+    Lycos2017 (Rosay et al., IEEE WI-IAT 2021) is the corrected variant of
+    CIC-IDS2017: same source pcaps but the LycoSTand feature extractor
+    fixes the CICFlowMeter bugs and the labels are re-aligned. The corpus
+    ships as one big CSV with 83 columns:
+        flow_id, src_addr, src_port, dst_addr, dst_port, ip_prot, timestamp,
+        75 numeric flow features (flow_duration, pkt_per_s, fwd_*, bwd_*,
+        iat_*, active/idle_*, flag_*, fwd_bulk_*, bwd_bulk_*, fwd_subflow_*,
+        bwd_subflow_*, fwd_tcp_init_win_bytes, bwd_tcp_init_win_bytes),
+        label.
+
+    The timestamp column is microseconds since Unix epoch. We convert it to
+    a pandas Timestamp so that ``_time_series_for_df`` downstream works,
+    and we synthesise a ``source_file`` column from the day-of-week so that
+    ``split_strategy='temporal_by_file'`` keeps the same per-day chronology
+    used for the CIC-IDS2017 evaluation.
+    """
+    csv_path = Path(csv_path)
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Lycos2017 CSV not found at: {csv_path}")
+
+    log(f"reading Lycos2017 single-CSV: {csv_path}")
+    df = pd.read_csv(csv_path, low_memory=False)
+    log(f"raw rows={len(df):,}, cols={df.shape[1]}")
+
+    if "timestamp" not in df.columns:
+        raise ValueError("Lycos2017 CSV must contain a 'timestamp' column.")
+
+    ts_us = pd.to_numeric(df["timestamp"], errors="coerce")
+    ts_dt = pd.to_datetime(ts_us, unit="us", errors="coerce")
+    df["timestamp"] = ts_dt
+
+    day_name = ts_dt.dt.day_name().fillna("Unknown")
+    df["source_file"] = day_name + "-WorkingHours.lycos.csv"
+    day_counts = df["source_file"].value_counts().to_dict()
+    log(f"derived source_file from timestamp day-of-week: {day_counts}")
+
+    df = canonicalize_columns(df)
+    df["row_id"] = np.arange(len(df), dtype=np.int64)
+    log(f"loaded rows={len(df):,}, cols={df.shape[1]}")
+    return df
+
+
+
+
+# UNSW-NB15 column ordering (Moustafa & Slay 2015) — 49 columns, no header in CSVs.
+UNSW_NB15_COLUMNS = [
+    "srcip", "sport", "dstip", "dsport", "proto", "state", "dur",
+    "sbytes", "dbytes", "sttl", "dttl", "sloss", "dloss", "service",
+    "Sload", "Dload", "Spkts", "Dpkts", "swin", "dwin", "stcpb",
+    "dtcpb", "smeansz", "dmeansz", "trans_depth", "res_bdy_len",
+    "Sjit", "Djit", "Stime", "Ltime", "Sintpkt", "Dintpkt", "tcprtt",
+    "synack", "ackdat", "is_sm_ips_ports", "ct_state_ttl",
+    "ct_flw_http_mthd", "is_ftp_login", "ct_ftp_cmd", "ct_srv_src",
+    "ct_srv_dst", "ct_dst_ltm", "ct_src_ltm", "ct_src_dport_ltm",
+    "ct_dst_sport_ltm", "ct_dst_src_ltm",
+    "attack_cat", "Label",
+]
+
+
+def read_unsw_nb15_folder(data_dir) -> pd.DataFrame:
+    """Read the four UNSW-NB15 CSV files (no header in the official release)
+    and return a DataFrame in the shape downstream cascade scripts expect.
+
+    UNSW-NB15 (Moustafa & Slay, 2015) is an independent NIDS benchmark
+    generated on the UNSW Cyber Range using the IXIA PerfectStorm tool. It
+    contains 9 attack families (Generic, Exploits, Fuzzers, DoS,
+    Reconnaissance, Analysis, Backdoor, Shellcode, Worms) plus benign
+    traffic, across ~2.5M flows. The CSV release has no header; this
+    function assigns the canonical 49-column schema.
+
+    The ``attack_cat`` column carries the multi-class attack name (NaN
+    for benign rows). We promote it to a ``label`` column so that
+    ``clean_detection_dataframe`` produces ``multiclass_label`` and
+    ``binary_label`` the same way it does for CIC-IDS2017 and Lycos2017.
+
+    Each input file's basename is used as the ``source_file`` so that
+    ``split_strategy='temporal_by_file'`` treats each release chunk as a
+    bucket (matching the multi-day CIC-IDS2017 evaluation pattern).
+    """
+    data_dir = Path(data_dir)
+    files = sorted(data_dir.glob("UNSW-NB15_*.csv"))
+    if not files:
+        raise FileNotFoundError(f"No UNSW-NB15_*.csv files in {data_dir}")
+    log(f"reading {len(files)} UNSW-NB15 CSVs from {data_dir}")
+
+    frames: list[pd.DataFrame] = []
+    for f in files:
+        try:
+            df = pd.read_csv(f, header=None, low_memory=False, encoding="utf-8")
+        except UnicodeDecodeError:
+            df = pd.read_csv(f, header=None, low_memory=False, encoding="latin-1")
+        if df.shape[1] != len(UNSW_NB15_COLUMNS):
+            raise ValueError(
+                f"{f.name}: expected {len(UNSW_NB15_COLUMNS)} columns, got "
+                f"{df.shape[1]}"
+            )
+        df.columns = UNSW_NB15_COLUMNS
+        df["source_file"] = f.name
+        frames.append(df)
+        log(f"  {f.name}: {len(df):,} rows")
+
+    merged = pd.concat(frames, axis=0, ignore_index=True)
+
+    # UNSW-NB15 has well-documented mixed-type quirks: some columns
+    # (notably ``sport``, ``dsport``, ``ct_ftp_cmd``) store integers as
+    # plain ints in some chunks and as strings in others, which crashes
+    # sklearn's OneHotEncoder downstream with
+    # "TypeError: Encoders require input ... uniformly strings or numbers".
+    # We force every column that is *supposed* to be numeric per the
+    # official UNSW spec to ``pd.to_numeric(errors='coerce')`` so the
+    # cascade preprocessor sees clean numeric dtypes.
+    UNSW_NUMERIC_COLUMNS = [
+        "sport", "dsport", "dur", "sbytes", "dbytes", "sttl", "dttl",
+        "sloss", "dloss", "Sload", "Dload", "Spkts", "Dpkts", "swin",
+        "dwin", "stcpb", "dtcpb", "smeansz", "dmeansz", "trans_depth",
+        "res_bdy_len", "Sjit", "Djit", "Stime", "Ltime", "Sintpkt",
+        "Dintpkt", "tcprtt", "synack", "ackdat", "is_sm_ips_ports",
+        "ct_state_ttl", "ct_flw_http_mthd", "is_ftp_login", "ct_ftp_cmd",
+        "ct_srv_src", "ct_srv_dst", "ct_dst_ltm", "ct_src_ltm",
+        "ct_src_dport_ltm", "ct_dst_sport_ltm", "ct_dst_src_ltm",
+    ]
+    for c in UNSW_NUMERIC_COLUMNS:
+        if c in merged.columns:
+            merged[c] = pd.to_numeric(merged[c], errors="coerce").fillna(0)
+
+    # Promote attack_cat to the standard `label` column (NaN -> "benign").
+    # clean_detection_dataframe will rename it to multiclass_label and
+    # derive binary_label from "BENIGN" vs other.
+    merged["label"] = (
+        merged["attack_cat"]
+        .fillna("benign")
+        .astype(str)
+        .str.strip()
+    )
+    merged = merged.drop(columns=["attack_cat", "Label"])
+
+    merged = canonicalize_columns(merged)
+    merged["row_id"] = np.arange(len(merged), dtype=np.int64)
+    log(f"merged UNSW-NB15: {len(merged):,} rows, {merged.shape[1]} cols")
+    return merged
+
+
 def clean_detection_dataframe(
     df: pd.DataFrame,
     max_missing_fraction: float = 0.30,
@@ -266,7 +412,21 @@ def load_and_prepare_detection_data(
     drop_unknown_labels: bool = True,
     split_strategy: str = "random",
 ) -> tuple[pd.DataFrame, DetectionSplits]:
-    raw = read_cic_ids2017_folder(data_dir)
+    # Auto-detect dataset format:
+    #   - lycos.csv in data_dir  -> Lycos2017 loader (single-file corrected CIC)
+    #   - UNSW-NB15_*.csv files  -> UNSW-NB15 loader (4 chunks, no header)
+    #   - otherwise              -> CIC-IDS2017 multi-file loader
+    data_dir_path = Path(data_dir)
+    lycos_csv = data_dir_path / "lycos.csv"
+    unsw_files = sorted(data_dir_path.glob("UNSW-NB15_*.csv"))
+    if lycos_csv.exists():
+        log(f"detected Lycos2017 corpus at: {lycos_csv}")
+        raw = read_lycos_csv(lycos_csv)
+    elif unsw_files:
+        log(f"detected UNSW-NB15 corpus ({len(unsw_files)} files) under {data_dir_path}")
+        raw = read_unsw_nb15_folder(data_dir_path)
+    else:
+        raw = read_cic_ids2017_folder(data_dir)
     cleaned = clean_detection_dataframe(
         raw,
         max_missing_fraction=max_missing_fraction,

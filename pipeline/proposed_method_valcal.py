@@ -380,6 +380,13 @@ def main() -> None:
     parser.add_argument("--gate-prob-col", default="gate_prob")
     parser.add_argument("--row-id-col", default="row_id")
     parser.add_argument(
+        "--method-name",
+        default="Hybrid-Cascade (ours)",
+        help="Label written to the 'method' column of overall_metrics_proposed_valcal.csv. "
+        "Override when running this script as a generic val-calibration step on baselines "
+        "(e.g., --method-name 'CLAD' for the CLOSR/CLAD baseline).",
+    )
+    parser.add_argument(
         "--rate-rules-csv",
         default=None,
         help="Optional CSV with 'row_id' plus rate_* indicator columns "
@@ -476,7 +483,7 @@ def main() -> None:
         yhat_acc = (s_test_in >= tau_acc_local).astype(np.int32)
         op_acc = f"val_accuracy_calibrated{suffix}"
         row_acc = metric_row(
-            method="Hybrid-Cascade (ours)",
+            method=args.method_name,
             operating_point=op_acc,
             threshold_source="validation",
             threshold=tau_acc_local,
@@ -498,7 +505,7 @@ def main() -> None:
             yhat_ba = (s_test_in >= tau_ba_local).astype(np.int32)
             op_ba = f"val_balanced_accuracy_calibrated{suffix}"
             row_ba = metric_row(
-                method="Hybrid-Cascade (ours)",
+                method=args.method_name,
                 operating_point=op_ba,
                 threshold_source="validation",
                 threshold=tau_ba_local,
@@ -538,7 +545,7 @@ def main() -> None:
     yhat_test_far = (s_test >= tau_far).astype(np.int32)
     rows.append(
         metric_row(
-            method="Hybrid-Cascade (ours)",
+            method=args.method_name,
             operating_point=f"val_far_calibrated_{args.target_far:.2e}",
             threshold_source="validation",
             threshold=tau_far,
@@ -554,7 +561,7 @@ def main() -> None:
         yhat_test_f1 = (s_test >= tau_f1).astype(np.int32)
         rows.append(
             metric_row(
-                method="Hybrid-Cascade (ours)",
+                method=args.method_name,
                 operating_point="val_f1_calibrated",
                 threshold_source="validation",
                 threshold=tau_f1,
@@ -570,7 +577,7 @@ def main() -> None:
         yhat_test_f1 = (s_test >= tau_test_f1).astype(np.int32)
         rows.append(
             metric_row(
-                method="Hybrid-Cascade (ours)",
+                method=args.method_name,
                 operating_point="test_f1_optimal",
                 threshold_source="test",
                 threshold=tau_test_f1,
@@ -584,7 +591,7 @@ def main() -> None:
         yhat_test_far_opt = (s_test >= tau_test_far).astype(np.int32)
         rows.append(
             metric_row(
-                method="Hybrid-Cascade (ours)",
+                method=args.method_name,
                 operating_point=f"test_far_matched_{args.target_far:.2e}",
                 threshold_source="test",
                 threshold=tau_test_far,
