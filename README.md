@@ -461,14 +461,49 @@ during reproduction:
 | Isolation Forest | 0.81 | 0.83 | 0.55 |
 | One-Class SVM | 0.79 | 0.85 | 0.58 |
 | LSTM autoencoder | 0.85 | 0.86 | 0.51 |
-| Random Forest (sup.) | 0.94 | 0.97 | 0.91 |
-| RF + Conformal | 0.94 | 0.97 | 0.91 |
+| Self-Supervised RF anomaly | 0.94 | 0.97 | 0.91 |
+| Self-Supervised RF + Conformal | 0.94 | 0.97 | 0.91 |
 | CLAD (Wilkie 2026) | 0.93 | 0.96 | 0.89 |
 | **Hybrid-Cascade (ours)** | **0.96** | **0.9999** | **0.93** |
 
 Variation up to ±0.01 across runs is normal (different sklearn
 versions, BLAS implementations). All numbers reported here are with
 seed 42 and the requirements pinned in `requirements.txt`.
+
+### Note on the Random Forest rows
+
+The "RF" rows above (and Tier 3 of the cascade) are **self-supervised
+anomaly detectors**, not supervised classifiers — even though they use
+`sklearn.RandomForestClassifier` internally. The design follows the
+classification-based anomaly detection pattern (Bergman & Hoshen,
+*Classification-based Anomaly Detection for General Data*, ICLR 2020):
+
+1. Train only on **benign** flows (no attack labels are ever shown to
+   the RF during training).
+2. Apply *k = 8* random orthogonal rotations to each benign feature
+   vector — producing 8 augmented copies per row.
+3. Train a `RandomForestClassifier` to predict **which rotation was
+   applied** (an 8-class pretext task).
+4. At inference, score a flow by how confidently the RF can attribute
+   its features to a single rotation. Benign-looking flows produce a
+   confident prediction; out-of-distribution (anomalous) flows
+   confuse the classifier and yield a low max-probability score.
+
+We chose this design because ESNIDSaaS is a service: new tenants
+arrive with traffic distributions we have never labelled, so a
+benign-only training signal generalises better than a supervised RF
+that fits one dataset's attack mix. The component ablation in
+`outputs_abl_*` is consistent with this — replacing the
+self-supervised RF with a supervised one drops cross-dataset accuracy
+on UNSW-NB15 by 6–9 points.
+
+"RF + Conformal" applies split-conformal calibration on top of the
+same self-supervised RF scores. Because conformal is a monotone
+rescaling, the val-accuracy-calibrated τ\* picks the same operating
+point and the headline metric is unchanged — but it gives well-
+calibrated p-values that the cascade gate consumes.
+
+Implementation: `pipeline/rf_anomaly.py` (`SelfSupervisedRFAnomaly`).
 
 ---
 
